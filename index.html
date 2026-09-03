@@ -22,10 +22,23 @@
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
+    canvas {
+      border: 1px solid #ddd;
+      background-color: #fafafa;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    #hint-display {
+      font-style: italic;
+      color: #555;
+      margin: 10px 0;
+    }
+
     #word-display {
       font-size: 2rem;
       letter-spacing: 10px;
-      margin: 20px 0;
+      margin: 15px 0;
     }
 
     #keyboard {
@@ -62,7 +75,9 @@
 
   <div id="game-container">
     <h1>Jogo da Forca</h1>
-    <p>Erros restantes: <span id="attempts">6</span></p>
+    <canvas id="hangman" width="200" height="200"></canvas>
+    
+    <div id="hint-display">Dica: <span id="hint"></span></div>
     <div id="word-display">_ _ _ _</div>
     <div id="keyboard"></div>
     <p id="message"></p>
@@ -70,22 +85,91 @@
   </div>
 
   <script>
-    const words = ["TECNOLOGIA", "PROGRAMACAO", "DESENVOLVEDOR", "INTERNET", "NICE"];
+    const wordList = [
+      { word: "TECNOLOGIA", hint: "Área ligada a computadores e inovação" },
+      { word: "PROGRAMACAO", hint: "Escrita de código para software" },
+      { word: "DESENVOLVEDOR", hint: "Pessoa que cria sistemas e apps" },
+      { word: "INTERNET", hint: "Rede mundial de computadores" },
+      { word: "JAVASCRIPT", hint: "Linguagem de programação para web" }
+    ];
+
     let selectedWord = "";
+    let selectedHint = "";
     let guessedWord = [];
-    let remainingAttempts = 6;
+    let wrongGuesses = 0;
+    const maxWrong = 6;
     let guessedLetters = [];
 
+    const canvas = document.getElementById("hangman");
+    const ctx = canvas.getContext("2d");
+
     function initGame() {
-      selectedWord = words[Math.floor(Math.random() * words.length)];
+      const randomItem = wordList[Math.floor(Math.random() * wordList.length)];
+      selectedWord = randomItem.word;
+      selectedHint = randomItem.hint;
+      
       guessedWord = Array(selectedWord.length).fill("_");
-      remainingAttempts = 6;
+      wrongGuesses = 0;
       guessedLetters = [];
 
-      document.getElementById("attempts").textContent = remainingAttempts;
+      document.getElementById("hint").textContent = selectedHint;
       document.getElementById("message").textContent = "";
+      
+      clearCanvas();
+      drawGallows();
       updateDisplay();
       createKeyboard();
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#333";
+    }
+
+    function drawGallows() {
+      ctx.beginPath();
+      // Base
+      ctx.moveTo(20, 180);
+      ctx.lineTo(180, 180);
+      // Poste vertical
+      ctx.moveTo(50, 180);
+      ctx.lineTo(50, 20);
+      // Topo
+      ctx.lineTo(130, 20);
+      // Corda
+      ctx.lineTo(130, 40);
+      ctx.stroke();
+    }
+
+    function drawHangmanStep(step) {
+      ctx.beginPath();
+      switch (step) {
+        case 1: // Cabeça
+          ctx.arc(130, 55, 15, 0, Math.PI * 2);
+          break;
+        case 2: // Corpo
+          ctx.moveTo(130, 70);
+          ctx.lineTo(130, 120);
+          break;
+        case 3: // Braço esquerdo
+          ctx.moveTo(130, 85);
+          ctx.lineTo(105, 105);
+          break;
+        case 4: // Braço direito
+          ctx.moveTo(130, 85);
+          ctx.lineTo(155, 105);
+          break;
+        case 5: // Perna esquerda
+          ctx.moveTo(130, 120);
+          ctx.lineTo(110, 155);
+          break;
+        case 6: // Perna direita
+          ctx.moveTo(130, 120);
+          ctx.lineTo(150, 155);
+          break;
+      }
+      ctx.stroke();
     }
 
     function updateDisplay() {
@@ -108,7 +192,7 @@
     }
 
     function handleGuess(letter) {
-      if (guessedLetters.includes(letter) || remainingAttempts <= 0) return;
+      if (guessedLetters.includes(letter) || wrongGuesses >= maxWrong) return;
 
       guessedLetters.push(letter);
       document.getElementById(`key-${letter}`).disabled = true;
@@ -122,8 +206,8 @@
         updateDisplay();
         checkWin();
       } else {
-        remainingAttempts--;
-        document.getElementById("attempts").textContent = remainingAttempts;
+        wrongGuesses++;
+        drawHangmanStep(wrongGuesses);
         checkLoss();
       }
     }
@@ -136,7 +220,7 @@
     }
 
     function checkLoss() {
-      if (remainingAttempts === 0) {
+      if (wrongGuesses === maxWrong) {
         document.getElementById("message").textContent = `Você perdeu! A palavra era: ${selectedWord}`;
         disableAllKeys();
       }
