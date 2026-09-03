@@ -3,20 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jogo da Forca</title>
+  <title>Jogo da Forca Pro</title>
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --card-bg: rgba(255, 255, 255, 0.95);
       --text: #1e293b;
       --text-muted: #64748b;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-gradient);
       color: var(--text);
       display: flex;
       justify-content: center;
@@ -24,32 +30,35 @@
       min-height: 100vh;
       margin: 0;
       padding: 20px;
-      box-sizing: border-box;
     }
 
     .game-card {
       background: var(--card-bg);
+      backdrop-filter: blur(10px);
       padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       text-align: center;
     }
 
     h1 {
-      margin: 0 0 10px 0;
-      font-size: 1.8rem;
-      color: var(--text);
+      margin: 0 0 15px 0;
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #312e81;
     }
 
     .hint-box {
       background-color: #f1f5f9;
-      padding: 10px 15px;
-      border-radius: 8px;
+      padding: 12px 18px;
+      border-radius: 12px;
       font-size: 0.95rem;
       color: var(--text-muted);
-      margin-bottom: 20px;
+      margin-bottom: 15px;
+      border: 1px solid #e2e8f0;
     }
 
     .hint-box strong {
@@ -57,58 +66,70 @@
     }
 
     canvas {
-      background: #fafafa;
+      background: #ffffff;
       border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      margin-bottom: 20px;
+      border-radius: 16px;
+      margin-bottom: 10px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
     }
 
     .word-display {
       font-size: 2.2rem;
-      font-weight: bold;
+      font-weight: 800;
       letter-spacing: 12px;
       color: var(--primary);
-      margin: 20px 0;
+      margin: 15px 0;
       min-height: 50px;
+      text-indent: 12px;
     }
 
     .keyboard {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 8px;
-      margin-top: 20px;
+      margin-top: 15px;
     }
 
     .key {
-      background: #f1f5f9;
+      background: #ffffff;
       border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 10px 0;
-      font-size: 1rem;
-      font-weight: 600;
+      border-radius: 10px;
+      padding: 12px 0;
+      font-size: 1.05rem;
+      font-weight: 700;
       color: var(--text);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 0 #cbd5e1;
     }
 
     .key:hover:not(:disabled) {
       background: var(--primary);
       color: white;
       border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 0 var(--primary-hover);
+    }
+
+    .key:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 0 0 transparent;
     }
 
     .key:disabled {
-      background: #e2e8f0;
-      color: #94a3b8;
+      background: #f1f5f9;
+      color: #cbd5e1;
       cursor: not-allowed;
-      border-color: #cbd5e1;
+      border-color: #e2e8f0;
+      box-shadow: none;
     }
 
     .message {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin: 15px 0 5px 0;
-      min-height: 28px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 10px 0;
+      min-height: 30px;
+      transition: all 0.3s ease;
     }
 
     .btn-reset {
@@ -116,17 +137,19 @@
       background: var(--primary);
       color: white;
       border: none;
-      padding: 12px 24px;
+      padding: 14px 24px;
       font-size: 1rem;
-      font-weight: 600;
-      border-radius: 8px;
+      font-weight: 700;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: all 0.2s ease;
       width: 100%;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
     }
 
     .btn-reset:hover {
       background: var(--primary-hover);
+      transform: translateY(-1px);
     }
   </style>
 </head>
@@ -136,10 +159,10 @@
     <h1>Jogo da Forca</h1>
     
     <div class="hint-box">
-      Dica: <strong id="hint">---</strong>
+      💡 <strong>Dica:</strong> <span id="hint">---</span>
     </div>
 
-    <canvas id="hangman" width="220" height="230"></canvas>
+    <canvas id="hangman" width="220" height="210"></canvas>
     
     <div id="word-display" class="word-display">_ _ _</div>
     <div id="message" class="message"></div>
@@ -154,7 +177,8 @@
       { word: "TECNOLOGIA", hint: "Área ligada a computadores e inovação" },
       { word: "PROGRAMACAO", hint: "Escrita de código para software" },
       { word: "DESENVOLVEDOR", hint: "Pessoa que cria sistemas e apps" },
-      { word: "INTERNET", hint: "Rede mundial de computadores" }
+      { word: "INTERNET", hint: "Rede mundial de computadores" },
+      { word: "JAVASCRIPT", hint: "Linguagem dinâmica para a web" }
     ];
 
     let selectedWord = "";
@@ -166,6 +190,39 @@
 
     const canvas = document.getElementById("hangman");
     const ctx = canvas.getContext("2d");
+
+    // Gerador de áudio via Web Audio API
+    function playSound(type) {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === "correct") {
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.2);
+      } else if (type === "wrong") {
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+      } else if (type === "win") {
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.4);
+      }
+    }
 
     function initGame() {
       const randomItem = wordList[Math.floor(Math.random() * wordList.length)];
@@ -188,56 +245,55 @@
     function clearCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.lineWidth = 4;
-      ctx.strokeStyle = "#1e293b";
+      ctx.strokeStyle = "#312e81";
       ctx.lineCap = "round";
     }
 
-    // Desenha a estrutura da forca idêntica ao rascunho
     function drawGallows() {
       ctx.beginPath();
-      // Base inferior
-      ctx.moveTo(30, 200);
-      ctx.lineTo(130, 200);
+      // Base
+      ctx.moveTo(30, 185);
+      ctx.lineTo(130, 185);
       // Haste vertical
-      ctx.moveTo(60, 200);
-      ctx.lineTo(60, 30);
-      // Haste horizontal superior
-      ctx.lineTo(160, 30);
-      // Suporte diagonal
-      ctx.moveTo(60, 70);
-      ctx.lineTo(100, 30);
+      ctx.moveTo(60, 185);
+      ctx.lineTo(60, 25);
+      // Haste superior
+      ctx.lineTo(160, 25);
+      // Apoio diagonal
+      ctx.moveTo(60, 60);
+      ctx.lineTo(95, 25);
       // Corda
-      ctx.moveTo(160, 30);
-      ctx.lineTo(160, 60);
+      ctx.moveTo(160, 25);
+      ctx.lineTo(160, 50);
       ctx.stroke();
     }
 
-    // Desenha as partes do boneco baseadas nas 6 tentativas
     function drawHangmanStep(step) {
       ctx.beginPath();
+      ctx.strokeStyle = "#ef4444";
       switch (step) {
         case 1: // Cabeça
-          ctx.arc(160, 78, 18, 0, Math.PI * 2);
+          ctx.arc(160, 66, 16, 0, Math.PI * 2);
           break;
-        case 2: // Tronco
-          ctx.moveTo(160, 96);
-          ctx.lineTo(160, 145);
+        case 2: // Corpo
+          ctx.moveTo(160, 82);
+          ctx.lineTo(160, 130);
           break;
         case 3: // Braço Esquerdo
-          ctx.moveTo(160, 108);
-          ctx.lineTo(135, 130);
+          ctx.moveTo(160, 95);
+          ctx.lineTo(138, 115);
           break;
         case 4: // Braço Direito
-          ctx.moveTo(160, 108);
-          ctx.lineTo(185, 130);
+          ctx.moveTo(160, 95);
+          ctx.lineTo(182, 115);
           break;
         case 5: // Perna Esquerda
-          ctx.moveTo(160, 145);
-          ctx.lineTo(135, 185);
+          ctx.moveTo(160, 130);
+          ctx.lineTo(138, 168);
           break;
         case 6: // Perna Direita
-          ctx.moveTo(160, 145);
-          ctx.lineTo(185, 185);
+          ctx.moveTo(160, 130);
+          ctx.lineTo(182, 168);
           break;
       }
       ctx.stroke();
@@ -269,6 +325,7 @@
       document.getElementById(`key-${letter}`).disabled = true;
 
       if (selectedWord.includes(letter)) {
+        playSound("correct");
         for (let i = 0; i < selectedWord.length; i++) {
           if (selectedWord[i] === letter) {
             guessedWord[i] = letter;
@@ -277,6 +334,7 @@
         updateDisplay();
         checkWin();
       } else {
+        playSound("wrong");
         wrongGuesses++;
         drawHangmanStep(wrongGuesses);
         checkLoss();
@@ -285,9 +343,10 @@
 
     function checkWin() {
       if (!guessedWord.includes("_")) {
+        playSound("win");
         const msg = document.getElementById("message");
         msg.textContent = "Parabéns! Você venceu! 🎉";
-        msg.style.color = "#16a34a";
+        msg.style.color = "var(--success)";
         disableAllKeys();
       }
     }
@@ -296,7 +355,7 @@
       if (wrongGuesses === maxWrong) {
         const msg = document.getElementById("message");
         msg.textContent = `Fim de jogo! A palavra era: ${selectedWord}`;
-        msg.style.color = "#dc2626";
+        msg.style.color = "var(--danger)";
         disableAllKeys();
       }
     }
