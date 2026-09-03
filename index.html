@@ -1,1 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogo da Forca</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #eaeaea;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 0 0 15px rgba(233, 69, 96, 0.6);
+      letter-spacing: 2px;
+    }
+
+    .subtitle {
+      margin-bottom: 25px;
+      opacity: 0.8;
+      font-size: 1.1rem;
+    }
+
+    .game-container {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      max-width: 650px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* ===== FORCA (SVG) ===== */
+    .hangman {
+      height: 220px;
+      margin-bottom: 20px;
+    }
+
+    .hangman svg {
+      height: 100%;
+      filter: drop-shadow(0 0 8px rgba(233, 69, 96, 0.4));
+    }
+
+    .part {
+      stroke: #e94560;
+      stroke-width: 4;
+      fill: none;
+      stroke-linecap: round;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .part.visible {
+      opacity: 1;
+    }
+
+    /* ===== PALAVRA ===== */
+    .word {
+      font-size: 2.4rem;
+      letter-spacing: 12px;
+      margin: 25px 0;
+      font-weight: 600;
+      min-height: 50px;
+      word-break: break-all;
+    }
+
+    .letter {
+      display: inline-block;
+      min-width: 30px;
+      border-bottom: 4px solid #e94560;
+      margin: 0 4px;
+      padding-bottom: 5px;
+    }
+
+    /* ===== TECLADO ===== */
+    .keyboard {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin: 25px 0;
+    }
+
+    .key {
+      width: 42px;
+      height: 42px;
+      border: none;
+      border-radius: 10px;
+      background: #e94560;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 0 #c73a52;
+    }
+
+    .key:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #c73a52;
+    }
+
+    .key:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #c73a52;
+    }
+
+    .key:disabled {
+      background: #555;
+      box-shadow: none;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .key.correct {
+      background: #00b894;
+      box-shadow: 0 4px 0 #009874;
+    }
+
+    .key.wrong {
+      background: #636e72;
+      box-shadow: none;
+    }
+
+    /* ===== STATUS ===== */
+    .status {
+      font-size: 1.3rem;
+      margin: 15px 0;
+      min-height: 30px;
+      font-weight: 500;
+    }
+
+    .status.win {
+      color: #00b894;
+    }
+
+    .status.lose {
+      color: #e94560;
+    }
+
+    .attempts {
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    /* ===== BOTÕES ===== */
+    .btn {
+      background: #00b894;
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: all 0.2s;
+      box-shadow: 0 5px 0 #009874;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 0 #009874;
+    }
+
+    .btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 #009874;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    footer {
+      margin-top: 30px;
+      opacity: 0.6;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>JOGO DA FORCA</h1>
+  <p class="subtitle">Adivinhe a palavra antes que o boneco seja enforcado!</p>
+
+  <div class="game-container">
+    <!-- Desenho da forca -->
+    <div class="hangman">
+      <svg viewBox="0 0 200 250">
+        <!-- Base -->
+        <line x1="20" y1="230" x2="100" y2="230" class="part visible" stroke="#ddd" stroke-width="6"/>
+        <!-- Poste vertical -->
+        <line x1="60" y1="230" x2="60" y2="20" class="part visible" stroke="#ddd" stroke-width="6"/>
+        <!-- Travessa -->
+        <line x1="60" y1="20" x2="140" y2="20" class="part visible" stroke="#ddd" stroke-width="6"/>
+        <!-- Corda -->
+        <line x1="140" y1="20" x2="140" y2="50" class="part visible" stroke="#ddd" stroke-width="4"/>
+
+        <!-- Cabeça -->
+        <circle cx="140" cy="70" r="20" class="part" id="head"/>
+        <!-- Corpo -->
+        <line x1="140" y1="90" x2="140" y2="150" class="part" id="body"/>
+        <!-- Braço esquerdo -->
+        <line x1="140" y1="110" x2="110" y2="140" class="part" id="left-arm"/>
+        <!-- Braço direito -->
+        <line x1="140" y1="110" x2="170" y2="140" class="part" id="right-arm"/>
+        <!-- Perna esquerda -->
+        <line x1="140" y1="150" x2="115" y2="190" class="part" id="left-leg"/>
+        <!-- Perna direita -->
+        <line x1="140" y1="150" x2="165" y2="190" class="part" id="right-leg"/>
+      </svg>
+    </div>
+
+    <div class="attempts">Erros restantes: <span id="errors">6</span></div>
+    <div class="word" id="word-display"></div>
+    <div class="status" id="status"></div>
+
+    <div class="keyboard" id="keyboard"></div>
+
+    <button class="btn hidden" id="restart-btn" onclick="startGame()">Jogar Novamente</button>
+  </div>
+
+  <footer>Feito com ❤️ em HTML + CSS + JS</footer>
+
+  <script>
+    // Lista de palavras (todas em maiúsculas e sem acento para facilitar)
+    const palavras = [
+      "COMPUTADOR", "PROGRAMACAO", "JAVASCRIPT", "INTERNET", "TECLADO",
+      "MONITOR", "ALGORITMO", "DESENVOLVEDOR", "BANCO", "DADOS",
+      "APLICATIVO", "NAVEGADOR", "SERVIDOR", "CODIGO", "FUNCAO",
+      "VARIAVEL", "OBJETO", "CLASSE", "METODO", "INTERFACE",
+      "RESPONSIVO", "FRAMEWORK", "BIBLIOTECA", "PACOTE", "MODULO",
+      "GITHUB", "TERMINAL", "COMANDO", "ARQUIVO", "PASTA",
+      "BRASIL", "PORTUGAL", "AMERICA", "EUROPA", "AFRICA",
+      "FUTEBOL", "BASQUETE", "VOLEI", "TENIS", "NATACAO",
+      "MUSICA", "GUITARRA", "PIANO", "BATERIA", "VIOLAO",
+      "CINEMA", "TEATRO", "LIVRO", "POESIA", "ROMANCE",
+      "ELEFANTE", "GIRAFA", "TIGRE", "LEAO", "MACACO",
+      "CACHORRO", "GATO", "PASSARO", "PEIXE", "COELHO",
+      "BANANA", "LARANJA", "MORANGO", "ABACAXI", "MELANCIA",
+      "CHOCOLATE", "BISCOITO", "BOLO", "SORVETE", "PIZZA"
+    ];
+
+    const partes = ["head", "body", "left-arm", "right-arm", "left-leg", "right-leg"];
+    let palavraSecreta = "";
+    let letrasCorretas = new Set();
+    let letrasErradas = new Set();
+    let erros = 0;
+    const maxErros = 6;
+
+    // Cria o teclado
+    function criarTeclado() {
+      const keyboard = document.getElementById("keyboard");
+      keyboard.innerHTML = "";
+      const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+      letras.forEach(letra => {
+        const btn = document.createElement("button");
+        btn.className = "key";
+        btn.textContent = letra;
+        btn.id = `key-${letra}`;
+        btn.onclick = () => tentarLetra(letra);
+        keyboard.appendChild(btn);
+      });
+    }
+
+    function startGame() {
+      // Escolhe palavra aleatória
+      palavraSecreta = palavras[Math.floor(Math.random() * palavras.length)];
+      letrasCorretas.clear();
+      letrasErradas.clear();
+      erros = 0;
+
+      // Reseta a forca
+      partes.forEach(id => {
+        document.getElementById(id).classList.remove("visible");
+      });
+
+      document.getElementById("errors").textContent = maxErros;
+      document.getElementById("status").textContent = "";
+      document.getElementById("status").className = "status";
+      document.getElementById("restart-btn").classList.add("hidden");
+      document.getElementById("keyboard").classList.remove("hidden");
+
+      criarTeclado();
+      atualizarPalavra();
+    }
+
+    function atualizarPalavra() {
+      const display = document.getElementById("word-display");
+      let html = "";
+
+      for (let letra of palavraSecreta) {
+        if (letrasCorretas.has(letra)) {
+          html += `<span class="letter">${letra}</span>`;
+        } else {
+          html += `<span class="letter">_</span>`;
+        }
+      }
+      display.innerHTML = html;
+    }
+
+    function tentarLetra(letra) {
+      const btn = document.getElementById(`key-${letra}`);
+      if (btn.disabled) return;
+
+      btn.disabled = true;
+
+      if (palavraSecreta.includes(letra)) {
+        letrasCorretas.add(letra);
+        btn.classList.add("correct");
+        atualizarPalavra();
+
+        // Verifica vitória
+        const ganhou = [...palavraSecreta].every(l => letrasCorretas.has(l));
+        if (ganhou) {
+          fimDeJogo(true);
+        }
+      } else {
+        letrasErradas.add(letra);
+        btn.classList.add("wrong");
+        erros++;
+        document.getElementById("errors").textContent = maxErros - erros;
+
+        // Mostra a parte do corpo
+        if (erros <= maxErros) {
+          document.getElementById(partes[erros - 1]).classList.add("visible");
+        }
+
+        if (erros >= maxErros) {
+          fimDeJogo(false);
+        }
+      }
+    }
+
+    function fimDeJogo(ganhou) {
+      const status = document.getElementById("status");
+      const keyboard = document.getElementById("keyboard");
+
+      // Desabilita todas as teclas
+      document.querySelectorAll(".key").forEach(btn => btn.disabled = true);
+
+      if (ganhou) {
+        status.textContent = "🎉 Parabéns! Você venceu!";
+        status.className = "status win";
+      } else {
+        status.textContent = `💀 Você perdeu! A palavra era: ${palavraSecreta}`;
+        status.className = "status lose";
+      }
+
+      document.getElementById("restart-btn").classList.remove("hidden");
+    }
+
+    // Suporte ao teclado físico
+    document.addEventListener("keydown", (e) => {
+      const letra = e.key.toUpperCase();
+      if (/^[A-Z]$/.test(letra)) {
+        tentarLetra(letra);
+      }
+    });
+
+    // Inicia o jogo
+    startGame();
+  </script>
+</body>
+</html>
