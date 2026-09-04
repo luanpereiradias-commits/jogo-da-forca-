@@ -3,370 +3,472 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jogo da Forca Pro</title>
+  <title>Jogo da Forca</title>
   <style>
-    :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --card-bg: rgba(255, 255, 255, 0.95);
-      --text: #1e293b;
-      --text-muted: #64748b;
-      --success: #10b981;
-      --danger: #ef4444;
-    }
-
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg-gradient);
-      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      margin: 0;
+      color: #eaeaea;
       padding: 20px;
     }
 
-    .game-card {
-      background: var(--card-bg);
+    .container {
+      background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(10px);
-      padding: 30px;
       border-radius: 24px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      padding: 30px 40px;
+      max-width: 700px;
       width: 100%;
-      max-width: 500px;
-      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     h1 {
-      margin: 0 0 15px 0;
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: #312e81;
+      text-align: center;
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #e94560, #ff6b6b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .hint-box {
-      background-color: #f1f5f9;
-      padding: 12px 18px;
-      border-radius: 12px;
+    .subtitle {
+      text-align: center;
+      color: #a0a0a0;
+      margin-bottom: 25px;
       font-size: 0.95rem;
-      color: var(--text-muted);
-      margin-bottom: 15px;
-      border: 1px solid #e2e8f0;
     }
 
-    .hint-box strong {
-      color: var(--primary);
+    .game-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      justify-content: center;
+      align-items: flex-start;
     }
 
-    canvas {
-      background: #ffffff;
-      border: 2px solid #e2e8f0;
-      border-radius: 16px;
-      margin-bottom: 10px;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    /* Área do desenho da forca */
+    .hangman-area {
+      flex: 0 0 220px;
+      text-align: center;
+    }
+
+    .hangman-svg {
+      width: 200px;
+      height: 250px;
+    }
+
+    /* Área da palavra e teclado */
+    .play-area {
+      flex: 1;
+      min-width: 280px;
     }
 
     .word-display {
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: 12px;
-      color: var(--primary);
-      margin: 15px 0;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 20px 0 30px;
       min-height: 50px;
-      text-indent: 12px;
     }
 
+    .letter-box {
+      width: 40px;
+      height: 48px;
+      border-bottom: 3px solid #e94560;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .letter-box.space {
+      border-bottom: none;
+      width: 20px;
+    }
+
+    .info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      color: #bbb;
+    }
+
+    .info span {
+      background: rgba(233, 69, 96, 0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+      color: #ff6b6b;
+    }
+
+    /* Teclado */
     .keyboard {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      display: flex;
+      flex-wrap: wrap;
       gap: 8px;
-      margin-top: 15px;
+      justify-content: center;
+      margin-bottom: 25px;
     }
 
     .key {
-      background: #ffffff;
-      border: 1px solid #cbd5e1;
+      width: 42px;
+      height: 42px;
+      border: none;
       border-radius: 10px;
-      padding: 12px 0;
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--text);
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s ease;
-      box-shadow: 0 2px 0 #cbd5e1;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
     }
 
     .key:hover:not(:disabled) {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
+      background: #e94560;
       transform: translateY(-2px);
-      box-shadow: 0 4px 0 var(--primary-hover);
-    }
-
-    .key:active:not(:disabled) {
-      transform: translateY(0);
-      box-shadow: 0 0 0 transparent;
     }
 
     .key:disabled {
-      background: #f1f5f9;
-      color: #cbd5e1;
+      opacity: 0.4;
       cursor: not-allowed;
-      border-color: #e2e8f0;
-      box-shadow: none;
     }
 
-    .message {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin: 10px 0;
-      min-height: 30px;
-      transition: all 0.3s ease;
+    .key.correct {
+      background: #2ecc71;
+      color: #fff;
     }
 
-    .btn-reset {
-      margin-top: 15px;
-      background: var(--primary);
-      color: white;
+    .key.wrong {
+      background: #e74c3c;
+      color: #fff;
+    }
+
+    /* Botões de controle */
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 28px;
       border: none;
-      padding: 14px 24px;
-      font-size: 1rem;
-      font-weight: 700;
       border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      width: 100%;
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
     }
 
-    .btn-reset:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
+    .btn-primary {
+      background: linear-gradient(135deg, #e94560, #ff6b6b);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(233, 69, 96, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ddd;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Mensagem de fim de jogo */
+    .message {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      min-height: 30px;
+    }
+
+    .message.win {
+      color: #2ecc71;
+    }
+
+    .message.lose {
+      color: #e74c3c;
+    }
+
+    .category {
+      text-align: center;
+      color: #ff6b6b;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    /* Responsivo */
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      .key {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+      }
+      .letter-box {
+        width: 32px;
+        height: 40px;
+        font-size: 1.4rem;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>🎮 Jogo da Forca</h1>
+    <p class="subtitle">Adivinhe a palavra antes que o boneco seja enforcado!</p>
 
-  <div class="game-card">
-    <h1>Jogo da Forca</h1>
-    
-    <div class="hint-box">
-      💡 <strong>Dica:</strong> <span id="hint">---</span>
+    <div class="category" id="category">Categoria: —</div>
+
+    <div class="game-area">
+      <!-- Desenho da forca -->
+      <div class="hangman-area">
+        <svg class="hangman-svg" viewBox="0 0 200 250">
+          <!-- Base -->
+          <line x1="20" y1="230" x2="100" y2="230" stroke="#8B4513" stroke-width="8" stroke-linecap="round"/>
+          <!-- Poste vertical -->
+          <line x1="40" y1="230" x2="40" y2="30" stroke="#8B4513" stroke-width="8" stroke-linecap="round"/>
+          <!-- Topo -->
+          <line x1="40" y1="30" x2="140" y2="30" stroke="#8B4513" stroke-width="8" stroke-linecap="round"/>
+          <!-- Corda -->
+          <line x1="140" y1="30" x2="140" y2="60" stroke="#D2B48C" stroke-width="4" stroke-linecap="round"/>
+
+          <!-- Cabeça -->
+          <circle id="head" cx="140" cy="80" r="20" fill="none" stroke="#eaeaea" stroke-width="4" style="display:none"/>
+          <!-- Corpo -->
+          <line id="body" x1="140" y1="100" x2="140" y2="160" stroke="#eaeaea" stroke-width="4" style="display:none"/>
+          <!-- Braço esquerdo -->
+          <line id="armL" x1="140" y1="120" x2="110" y2="145" stroke="#eaeaea" stroke-width="4" style="display:none"/>
+          <!-- Braço direito -->
+          <line id="armR" x1="140" y1="120" x2="170" y2="145" stroke="#eaeaea" stroke-width="4" style="display:none"/>
+          <!-- Perna esquerda -->
+          <line id="legL" x1="140" y1="160" x2="115" y2="200" stroke="#eaeaea" stroke-width="4" style="display:none"/>
+          <!-- Perna direita -->
+          <line id="legR" x1="140" y1="160" x2="165" y2="200" stroke="#eaeaea" stroke-width="4" style="display:none"/>
+        </svg>
+      </div>
+
+      <!-- Área de jogo -->
+      <div class="play-area">
+        <div class="info">
+          <div>Erros: <span id="errors">0 / 6</span></div>
+          <div>Letras usadas: <span id="used-letters">—</span></div>
+        </div>
+
+        <div class="word-display" id="word-display"></div>
+
+        <div class="keyboard" id="keyboard"></div>
+
+        <div class="controls">
+          <button class="btn btn-primary" id="new-game-btn">Nova Palavra</button>
+          <button class="btn btn-secondary" id="hint-btn">Dica</button>
+        </div>
+
+        <div class="message" id="message"></div>
+      </div>
     </div>
-
-    <canvas id="hangman" width="220" height="210"></canvas>
-    
-    <div id="word-display" class="word-display">_ _ _</div>
-    <div id="message" class="message"></div>
-    <div id="keyboard" class="keyboard"></div>
-
-    <button class="btn-reset" onclick="initGame()">Novo Jogo</button>
   </div>
 
   <script>
-    const wordList = [
-      { word: "OLA", hint: "Uma saudação comum" },
-      { word: "TECNOLOGIA", hint: "Área ligada a computadores e inovação" },
-      { word: "PROGRAMACAO", hint: "Escrita de código para software" },
-      { word: "DESENVOLVEDOR", hint: "Pessoa que cria sistemas e apps" },
-      { word: "INTERNET", hint: "Rede mundial de computadores" },
-      { word: "JAVASCRIPT", hint: "Linguagem dinâmica para a web" }
-    ];
+    // ===== BANCO DE PALAVRAS =====
+    const words = {
+      "Animais": ["ELEFANTE", "GIRAFA", "TIGRE", "LEAO", "MACACO", "CACHORRO", "GATO", "COELHO", "PAPAGAIO", "CROCODILO"],
+      "Frutas": ["BANANA", "LARANJA", "MORANGO", "ABACAXI", "MELANCIA", "UVA", "MANGA", "PESSEGO", "KIWI", "COCO"],
+      "Países": ["BRASIL", "ARGENTINA", "PORTUGAL", "ESPANHA", "FRANCA", "ITALIA", "JAPAO", "CANADA", "MEXICO", "CHILE"],
+      "Objetos": ["CADEIRA", "MESA", "COMPUTADOR", "TELEFONE", "LIVRO", "CANETA", "RELOGIO", "OCULOS", "MOCHILA", "CHAVE"],
+      "Profissões": ["MEDICO", "PROFESSOR", "ENGENHEIRO", "ADVOGADO", "BOMBEIRO", "POLICIAL", "COZINHEIRO", "PILOTO", "JORNALISTA", "ARQUITETO"],
+      "Esportes": ["FUTEBOL", "BASQUETE", "VOLEI", "TENIS", "NATACAO", "ATLETISMO", "HANDEBOL", "CICLISMO", "SURFE", "BOXE"]
+    };
 
+    // ===== VARIÁVEIS DO JOGO =====
     let selectedWord = "";
-    let selectedHint = "";
-    let guessedWord = [];
+    let selectedCategory = "";
+    let guessedLetters = [];
     let wrongGuesses = 0;
     const maxWrong = 6;
-    let guessedLetters = [];
+    let gameOver = false;
 
-    const canvas = document.getElementById("hangman");
-    const ctx = canvas.getContext("2d");
+    // Elementos DOM
+    const wordDisplay = document.getElementById("word-display");
+    const keyboard = document.getElementById("keyboard");
+    const errorsEl = document.getElementById("errors");
+    const usedLettersEl = document.getElementById("used-letters");
+    const messageEl = document.getElementById("message");
+    const categoryEl = document.getElementById("category");
+    const newGameBtn = document.getElementById("new-game-btn");
+    const hintBtn = document.getElementById("hint-btn");
 
-    // Gerador de áudio via Web Audio API
-    function playSound(type) {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
+    // Partes do boneco (ordem de aparição)
+    const hangmanParts = ["head", "body", "armL", "armR", "legL", "legR"];
 
-      if (type === "correct") {
-        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.2);
-      } else if (type === "wrong") {
-        osc.type = "sawtooth";
-        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.25);
-      } else if (type === "win") {
-        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-        osc.frequency.setValueAtTime(554.37, audioCtx.currentTime + 0.1);
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.2);
-        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.4);
-      }
-    }
-
-    function initGame() {
-      const randomItem = wordList[Math.floor(Math.random() * wordList.length)];
-      selectedWord = randomItem.word;
-      selectedHint = randomItem.hint;
-      
-      guessedWord = Array(selectedWord.length).fill("_");
-      wrongGuesses = 0;
-      guessedLetters = [];
-
-      document.getElementById("hint").textContent = selectedHint;
-      document.getElementById("message").textContent = "";
-      
-      clearCanvas();
-      drawGallows();
-      updateDisplay();
-      createKeyboard();
-    }
-
-    function clearCanvas() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = "#312e81";
-      ctx.lineCap = "round";
-    }
-
-    function drawGallows() {
-      ctx.beginPath();
-      // Base
-      ctx.moveTo(30, 185);
-      ctx.lineTo(130, 185);
-      // Haste vertical
-      ctx.moveTo(60, 185);
-      ctx.lineTo(60, 25);
-      // Haste superior
-      ctx.lineTo(160, 25);
-      // Apoio diagonal
-      ctx.moveTo(60, 60);
-      ctx.lineTo(95, 25);
-      // Corda
-      ctx.moveTo(160, 25);
-      ctx.lineTo(160, 50);
-      ctx.stroke();
-    }
-
-    function drawHangmanStep(step) {
-      ctx.beginPath();
-      ctx.strokeStyle = "#ef4444";
-      switch (step) {
-        case 1: // Cabeça
-          ctx.arc(160, 66, 16, 0, Math.PI * 2);
-          break;
-        case 2: // Corpo
-          ctx.moveTo(160, 82);
-          ctx.lineTo(160, 130);
-          break;
-        case 3: // Braço Esquerdo
-          ctx.moveTo(160, 95);
-          ctx.lineTo(138, 115);
-          break;
-        case 4: // Braço Direito
-          ctx.moveTo(160, 95);
-          ctx.lineTo(182, 115);
-          break;
-        case 5: // Perna Esquerda
-          ctx.moveTo(160, 130);
-          ctx.lineTo(138, 168);
-          break;
-        case 6: // Perna Direita
-          ctx.moveTo(160, 130);
-          ctx.lineTo(182, 168);
-          break;
-      }
-      ctx.stroke();
-    }
-
-    function updateDisplay() {
-      document.getElementById("word-display").textContent = guessedWord.join(" ");
-    }
-
-    function createKeyboard() {
-      const keyboard = document.getElementById("keyboard");
+    // ===== FUNÇÕES =====
+    function initKeyboard() {
       keyboard.innerHTML = "";
-
-      for (let i = 65; i <= 90; i++) {
-        const letter = String.fromCharCode(i);
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+      letters.forEach(letter => {
         const btn = document.createElement("button");
-        btn.textContent = letter;
         btn.className = "key";
-        btn.id = `key-${letter}`;
-        btn.onclick = () => handleGuess(letter);
+        btn.textContent = letter;
+        btn.dataset.letter = letter;
+        btn.addEventListener("click", () => handleGuess(letter));
         keyboard.appendChild(btn);
-      }
+      });
+    }
+
+    function pickRandomWord() {
+      const categories = Object.keys(words);
+      selectedCategory = categories[Math.floor(Math.random() * categories.length)];
+      const list = words[selectedCategory];
+      selectedWord = list[Math.floor(Math.random() * list.length)];
+    }
+
+    function displayWord() {
+      wordDisplay.innerHTML = "";
+      selectedWord.split("").forEach(char => {
+        const box = document.createElement("div");
+        box.className = "letter-box";
+        if (char === " ") {
+          box.classList.add("space");
+          box.textContent = "";
+        } else {
+          box.textContent = guessedLetters.includes(char) ? char : "";
+        }
+        wordDisplay.appendChild(box);
+      });
+    }
+
+    function updateHangman() {
+      hangmanParts.forEach((part, index) => {
+        const el = document.getElementById(part);
+        el.style.display = index < wrongGuesses ? "block" : "none";
+      });
+    }
+
+    function updateInfo() {
+      errorsEl.textContent = `${wrongGuesses} / ${maxWrong}`;
+      usedLettersEl.textContent = guessedLetters.length ? guessedLetters.join(", ") : "—";
     }
 
     function handleGuess(letter) {
-      if (guessedLetters.includes(letter) || wrongGuesses >= maxWrong) return;
+      if (gameOver || guessedLetters.includes(letter)) return;
 
       guessedLetters.push(letter);
-      document.getElementById(`key-${letter}`).disabled = true;
+
+      // Marca a tecla
+      const keyBtn = document.querySelector(`.key[data-letter="${letter}"]`);
+      if (keyBtn) keyBtn.disabled = true;
 
       if (selectedWord.includes(letter)) {
-        playSound("correct");
-        for (let i = 0; i < selectedWord.length; i++) {
-          if (selectedWord[i] === letter) {
-            guessedWord[i] = letter;
-          }
-        }
-        updateDisplay();
+        keyBtn.classList.add("correct");
+        displayWord();
         checkWin();
       } else {
-        playSound("wrong");
+        keyBtn.classList.add("wrong");
         wrongGuesses++;
-        drawHangmanStep(wrongGuesses);
-        checkLoss();
+        updateHangman();
+        updateInfo();
+        checkLose();
       }
     }
 
     function checkWin() {
-      if (!guessedWord.includes("_")) {
-        playSound("win");
-        const msg = document.getElementById("message");
-        msg.textContent = "Parabéns! Você venceu! 🎉";
-        msg.style.color = "var(--success)";
+      const allGuessed = selectedWord.split("").every(char => 
+        char === " " || guessedLetters.includes(char)
+      );
+      if (allGuessed) {
+        gameOver = true;
+        messageEl.textContent = "🎉 Parabéns! Você venceu!";
+        messageEl.className = "message win";
         disableAllKeys();
       }
     }
 
-    function checkLoss() {
-      if (wrongGuesses === maxWrong) {
-        const msg = document.getElementById("message");
-        msg.textContent = `Fim de jogo! A palavra era: ${selectedWord}`;
-        msg.style.color = "var(--danger)";
+    function checkLose() {
+      if (wrongGuesses >= maxWrong) {
+        gameOver = true;
+        messageEl.textContent = `💀 Você perdeu! A palavra era: ${selectedWord}`;
+        messageEl.className = "message lose";
+        // Revela a palavra
+        guessedLetters = selectedWord.split("");
+        displayWord();
         disableAllKeys();
       }
     }
 
     function disableAllKeys() {
-      const buttons = document.querySelectorAll(".key");
-      buttons.forEach(btn => btn.disabled = true);
+      document.querySelectorAll(".key").forEach(btn => btn.disabled = true);
     }
 
-    initGame();
-  </script>
+    function giveHint() {
+      if (gameOver) return;
+      const remaining = selectedWord.split("").filter(c => 
+        c !== " " && !guessedLetters.includes(c)
+      );
+      if (remaining.length === 0) return;
 
+      const hintLetter = remaining[Math.floor(Math.random() * remaining.length)];
+      handleGuess(hintLetter);
+    }
+
+    function startNewGame() {
+      guessedLetters = [];
+      wrongGuesses = 0;
+      gameOver = false;
+      messageEl.textContent = "";
+      messageEl.className = "message";
+
+      pickRandomWord();
+      categoryEl.textContent = `Categoria: ${selectedCategory}`;
+      displayWord();
+      updateHangman();
+      updateInfo();
+      initKeyboard();
+    }
+
+    // ===== EVENTOS =====
+    newGameBtn.addEventListener("click", startNewGame);
+    hintBtn.addEventListener("click", giveHint);
+
+    // Teclado físico
+    document.addEventListener("keydown", (e) => {
+      const letter = e.key.toUpperCase();
+      if (/^[A-Z]$/.test(letter)) {
+        handleGuess(letter);
+      }
+    });
+
+    // Inicia o jogo
+    startNewGame();
+  </script>
 </body>
 </html>
