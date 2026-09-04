@@ -58,7 +58,6 @@
       align-items: flex-start;
     }
 
-    /* Área do desenho da forca */
     .hangman-area {
       flex: 0 0 220px;
       text-align: center;
@@ -69,7 +68,6 @@
       height: 250px;
     }
 
-    /* Área da palavra e teclado */
     .play-area {
       flex: 1;
       min-width: 280px;
@@ -80,7 +78,7 @@
       justify-content: center;
       gap: 10px;
       flex-wrap: wrap;
-      margin: 20px 0 30px;
+      margin: 20px 0 25px;
       min-height: 50px;
     }
 
@@ -105,7 +103,7 @@
     .info {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       font-size: 0.95rem;
       color: #bbb;
     }
@@ -117,7 +115,28 @@
       color: #ff6b6b;
     }
 
-    /* Teclado */
+    /* Caixa de dica */
+    .hint-box {
+      background: rgba(233, 69, 96, 0.15);
+      border: 1px solid rgba(233, 69, 96, 0.4);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 1rem;
+      color: #ffb3c1;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .hint-box.empty {
+      opacity: 0.5;
+      border-style: dashed;
+    }
+
     .keyboard {
       display: flex;
       flex-wrap: wrap;
@@ -160,7 +179,6 @@
       color: #fff;
     }
 
-    /* Botões de controle */
     .controls {
       display: flex;
       gap: 12px;
@@ -197,7 +215,11 @@
       background: rgba(255, 255, 255, 0.2);
     }
 
-    /* Mensagem de fim de jogo */
+    .btn-secondary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
     .message {
       text-align: center;
       margin-top: 20px;
@@ -222,7 +244,6 @@
       letter-spacing: 1px;
     }
 
-    /* Responsivo */
     @media (max-width: 600px) {
       .container {
         padding: 20px;
@@ -254,26 +275,16 @@
       <!-- Desenho da forca -->
       <div class="hangman-area">
         <svg class="hangman-svg" viewBox="0 0 200 250">
-          <!-- Base -->
           <line x1="20" y1="230" x2="100" y2="230" stroke="#8B4513" stroke-width="8" stroke-linecap="round"/>
-          <!-- Poste vertical -->
           <line x1="40" y1="230" x2="40" y2="30" stroke="#8B4513" stroke-width="8" stroke-linecap="round"/>
-          <!-- Topo -->
           <line x1="40" y1="30" x2="140" y2="30" stroke="#8B4513" stroke-width="8" stroke-linecap="round"/>
-          <!-- Corda -->
           <line x1="140" y1="30" x2="140" y2="60" stroke="#D2B48C" stroke-width="4" stroke-linecap="round"/>
 
-          <!-- Cabeça -->
           <circle id="head" cx="140" cy="80" r="20" fill="none" stroke="#eaeaea" stroke-width="4" style="display:none"/>
-          <!-- Corpo -->
           <line id="body" x1="140" y1="100" x2="140" y2="160" stroke="#eaeaea" stroke-width="4" style="display:none"/>
-          <!-- Braço esquerdo -->
           <line id="armL" x1="140" y1="120" x2="110" y2="145" stroke="#eaeaea" stroke-width="4" style="display:none"/>
-          <!-- Braço direito -->
           <line id="armR" x1="140" y1="120" x2="170" y2="145" stroke="#eaeaea" stroke-width="4" style="display:none"/>
-          <!-- Perna esquerda -->
           <line id="legL" x1="140" y1="160" x2="115" y2="200" stroke="#eaeaea" stroke-width="4" style="display:none"/>
-          <!-- Perna direita -->
           <line id="legR" x1="140" y1="160" x2="165" y2="200" stroke="#eaeaea" stroke-width="4" style="display:none"/>
         </svg>
       </div>
@@ -283,6 +294,11 @@
         <div class="info">
           <div>Erros: <span id="errors">0 / 6</span></div>
           <div>Letras usadas: <span id="used-letters">—</span></div>
+        </div>
+
+        <!-- Caixa de dica -->
+        <div class="hint-box empty" id="hint-box">
+          Clique em "Dica" para receber uma pista
         </div>
 
         <div class="word-display" id="word-display"></div>
@@ -300,23 +316,91 @@
   </div>
 
   <script>
-    // ===== BANCO DE PALAVRAS =====
+    // ===== BANCO DE PALAVRAS + DICAS ESPECÍFICAS =====
     const words = {
-      "Animais": ["ELEFANTE", "GIRAFA", "TIGRE", "LEAO", "MACACO", "CACHORRO", "GATO", "COELHO", "PAPAGAIO", "CROCODILO"],
-      "Frutas": ["BANANA", "LARANJA", "MORANGO", "ABACAXI", "MELANCIA", "UVA", "MANGA", "PESSEGO", "KIWI", "COCO"],
-      "Países": ["BRASIL", "ARGENTINA", "PORTUGAL", "ESPANHA", "FRANCA", "ITALIA", "JAPAO", "CANADA", "MEXICO", "CHILE"],
-      "Objetos": ["CADEIRA", "MESA", "COMPUTADOR", "TELEFONE", "LIVRO", "CANETA", "RELOGIO", "OCULOS", "MOCHILA", "CHAVE"],
-      "Profissões": ["MEDICO", "PROFESSOR", "ENGENHEIRO", "ADVOGADO", "BOMBEIRO", "POLICIAL", "COZINHEIRO", "PILOTO", "JORNALISTA", "ARQUITETO"],
-      "Esportes": ["FUTEBOL", "BASQUETE", "VOLEI", "TENIS", "NATACAO", "ATLETISMO", "HANDEBOL", "CICLISMO", "SURFE", "BOXE"]
+      "Animais": {
+        "ELEFANTE": "Maior animal terrestre, tem tromba e grandes orelhas",
+        "GIRAFA": "Animal mais alto do mundo, com pescoço bem longo",
+        "TIGRE": "Felino listrado de laranja e preto, vive na Ásia",
+        "LEAO": "Conhecido como o rei da selva, tem uma grande juba",
+        "MACACO": "Animal que vive em árvores e é parecido com o ser humano",
+        "CACHORRO": "Melhor amigo do homem, late e abana o rabo",
+        "GATO": "Animal doméstico que mia e adora caçar ratos",
+        "COELHO": "Animal de orelhas longas que pula e come cenoura",
+        "PAPAGAIO": "Ave colorida que consegue imitar a fala humana",
+        "CROCODILO": "Réptil grande de água doce com muitos dentes afiados"
+      },
+      "Frutas": {
+        "BANANA": "Fruta amarela alongada, muito comum no café da manhã",
+        "LARANJA": "Fruta cítrica redonda e suculenta, rica em vitamina C",
+        "MORANGO": "Fruta vermelha pequena com sementes por fora",
+        "ABACAXI": "Fruta tropical com casca espinhosa e coroa de folhas",
+        "MELANCIA": "Fruta grande, verde por fora e vermelha por dentro no verão",
+        "UVA": "Fruta pequena que cresce em cachos e pode ser verde ou roxa",
+        "MANGA": "Fruta tropical doce de polpa amarela ou alaranjada",
+        "PESSEGO": "Fruta aveludada de cor rosada/alaranjada com caroço",
+        "KIWI": "Fruta pequena marrom por fora e verde por dentro com sementes pretas",
+        "COCO": "Fruta com casca dura e água doce no interior"
+      },
+      "Países": {
+        "BRASIL": "Maior país da América do Sul, fala português",
+        "ARGENTINA": "País vizinho do Brasil famoso pelo tango e pelo futebol",
+        "PORTUGAL": "País europeu de onde veio a língua portuguesa",
+        "ESPANHA": "País europeu famoso pela paella e pelas touradas",
+        "FRANCA": "País europeu conhecido pela Torre Eiffel e pelo vinho",
+        "ITALIA": "País em formato de bota, famoso pela pizza e pelo macarrão",
+        "JAPAO": "País asiático das tecnologias e do sushi",
+        "CANADA": "País da América do Norte famoso pelo xarope de bordo e pelo frio",
+        "MEXICO": "País da América do Norte conhecido pelos tacos e pelo Dia dos Mortos",
+        "CHILE": "País longo e estreito da América do Sul, entre os Andes e o Pacífico"
+      },
+      "Objetos": {
+        "CADEIRA": "Móvel usado para sentar, tem encosto e pernas",
+        "MESA": "Móvel plano usado para colocar objetos ou fazer refeições",
+        "COMPUTADOR": "Máquina eletrônica usada para trabalhar, estudar e jogar",
+        "TELEFONE": "Aparelho usado para fazer ligações e enviar mensagens",
+        "LIVRO": "Conjunto de páginas com texto ou imagens para leitura",
+        "CANETA": "Instrumento usado para escrever com tinta",
+        "RELOGIO": "Objeto usado para marcar as horas",
+        "OCULOS": "Acessório usado no rosto para melhorar a visão",
+        "MOCHILA": "Bolsa que se carrega nas costas, usada por estudantes",
+        "CHAVE": "Objeto de metal usado para abrir fechaduras"
+      },
+      "Profissões": {
+        "MEDICO": "Profissional que cuida da saúde e trata doenças",
+        "PROFESSOR": "Pessoa que ensina alunos em escolas ou universidades",
+        "ENGENHEIRO": "Profissional que projeta e constrói máquinas, pontes e prédios",
+        "ADVOGADO": "Profissional que defende pessoas na justiça",
+        "BOMBEIRO": "Profissional que apaga incêndios e faz resgates",
+        "POLICIAL": "Profissional responsável por manter a ordem e a segurança",
+        "COZINHEIRO": "Pessoa que prepara refeições em restaurantes",
+        "PILOTO": "Profissional que dirige aviões ou helicópteros",
+        "JORNALISTA": "Pessoa que escreve notícias e reportagens",
+        "ARQUITETO": "Profissional que projeta casas e edifícios"
+      },
+      "Esportes": {
+        "FUTEBOL": "Esporte mais popular do Brasil, jogado com uma bola nos pés",
+        "BASQUETE": "Esporte em que se joga a bola em uma cesta alta",
+        "VOLEI": "Esporte em que se joga a bola por cima de uma rede com as mãos",
+        "TENIS": "Esporte jogado com raquete e uma bolinha amarela",
+        "NATACAO": "Esporte praticado dentro da água, em piscinas",
+        "ATLETISMO": "Conjunto de provas de corrida, salto e arremesso",
+        "HANDEBOL": "Esporte parecido com o futebol, mas jogado com as mãos",
+        "CICLISMO": "Esporte praticado com bicicleta",
+        "SURFE": "Esporte praticado no mar em cima de uma prancha",
+        "BOXE": "Esporte de luta em que se usa luvas e se luta no ringue"
+      }
     };
 
     // ===== VARIÁVEIS DO JOGO =====
     let selectedWord = "";
     let selectedCategory = "";
+    let selectedHint = "";
     let guessedLetters = [];
     let wrongGuesses = 0;
     const maxWrong = 6;
     let gameOver = false;
+    let hintUsed = false;
 
     // Elementos DOM
     const wordDisplay = document.getElementById("word-display");
@@ -325,10 +409,10 @@
     const usedLettersEl = document.getElementById("used-letters");
     const messageEl = document.getElementById("message");
     const categoryEl = document.getElementById("category");
+    const hintBox = document.getElementById("hint-box");
     const newGameBtn = document.getElementById("new-game-btn");
     const hintBtn = document.getElementById("hint-btn");
 
-    // Partes do boneco (ordem de aparição)
     const hangmanParts = ["head", "body", "armL", "armR", "legL", "legR"];
 
     // ===== FUNÇÕES =====
@@ -348,8 +432,9 @@
     function pickRandomWord() {
       const categories = Object.keys(words);
       selectedCategory = categories[Math.floor(Math.random() * categories.length)];
-      const list = words[selectedCategory];
-      selectedWord = list[Math.floor(Math.random() * list.length)];
+      const wordList = Object.keys(words[selectedCategory]);
+      selectedWord = wordList[Math.floor(Math.random() * wordList.length)];
+      selectedHint = words[selectedCategory][selectedWord];
     }
 
     function displayWord() {
@@ -384,7 +469,6 @@
 
       guessedLetters.push(letter);
 
-      // Marca a tecla
       const keyBtn = document.querySelector(`.key[data-letter="${letter}"]`);
       if (keyBtn) keyBtn.disabled = true;
 
@@ -410,6 +494,7 @@
         messageEl.textContent = "🎉 Parabéns! Você venceu!";
         messageEl.className = "message win";
         disableAllKeys();
+        hintBtn.disabled = true;
       }
     }
 
@@ -418,10 +503,10 @@
         gameOver = true;
         messageEl.textContent = `💀 Você perdeu! A palavra era: ${selectedWord}`;
         messageEl.className = "message lose";
-        // Revela a palavra
         guessedLetters = selectedWord.split("");
         displayWord();
         disableAllKeys();
+        hintBtn.disabled = true;
       }
     }
 
@@ -430,22 +515,30 @@
     }
 
     function giveHint() {
-      if (gameOver) return;
-      const remaining = selectedWord.split("").filter(c => 
-        c !== " " && !guessedLetters.includes(c)
-      );
-      if (remaining.length === 0) return;
+      if (gameOver || hintUsed) return;
 
-      const hintLetter = remaining[Math.floor(Math.random() * remaining.length)];
-      handleGuess(hintLetter);
+      // Mostra a dica específica
+      hintBox.textContent = "💡 " + selectedHint;
+      hintBox.classList.remove("empty");
+
+      hintUsed = true;
+      hintBtn.disabled = true;
+      hintBtn.textContent = "Dica usada";
     }
 
     function startNewGame() {
       guessedLetters = [];
       wrongGuesses = 0;
       gameOver = false;
+      hintUsed = false;
       messageEl.textContent = "";
       messageEl.className = "message";
+
+      // Reseta a caixa de dica
+      hintBox.textContent = "Clique em \"Dica\" para receber uma pista";
+      hintBox.classList.add("empty");
+      hintBtn.disabled = false;
+      hintBtn.textContent = "Dica";
 
       pickRandomWord();
       categoryEl.textContent = `Categoria: ${selectedCategory}`;
