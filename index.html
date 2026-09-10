@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Tema Escuro (padrão) */
       --bg-1: #0f0c29;
       --bg-2: #302b63;
       --bg-3: #24243e;
@@ -17,6 +16,7 @@
       --accent-2: #c44569;
       --success: #2ed573;
       --danger: #ff4757;
+      --warning: #feca57;
       --text: #f1f2f6;
       --text-muted: #a4b0be;
       --glass: rgba(255, 255, 255, 0.07);
@@ -37,6 +37,7 @@
       --accent-2: #d63031;
       --success: #00b894;
       --danger: #d63031;
+      --warning: #fdcb6e;
       --text: #2d3436;
       --text-muted: #636e72;
       --glass: rgba(255, 255, 255, 0.75);
@@ -49,11 +50,7 @@
       --hint-text: #c44569;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Outfit', system-ui, sans-serif;
@@ -63,12 +60,11 @@
       justify-content: center;
       align-items: center;
       color: var(--text);
-      padding: 20px;
+      padding: 16px;
       overflow-x: hidden;
       transition: background 0.5s ease, color 0.4s ease;
     }
 
-    /* ===== PARTÍCULAS ===== */
     #particles {
       position: fixed;
       inset: 0;
@@ -86,32 +82,21 @@
     }
 
     @keyframes floatParticle {
-      0% {
-        transform: translateY(100vh) scale(0);
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 0.6;
-      }
-      100% {
-        transform: translateY(-10vh) scale(1);
-        opacity: 0;
-      }
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 0.6; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
     }
 
-    /* ===== CONTAINER ===== */
     .container {
       position: relative;
       z-index: 1;
       background: var(--glass);
       backdrop-filter: blur(22px);
       -webkit-backdrop-filter: blur(22px);
-      border-radius: 32px;
-      padding: 36px 40px;
-      max-width: 840px;
+      border-radius: 28px;
+      padding: 28px 32px;
+      max-width: 900px;
       width: 100%;
       box-shadow: var(--card-shadow);
       border: 1px solid var(--glass-border);
@@ -120,32 +105,25 @@
     }
 
     @keyframes containerIn {
-      from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.97);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
+      from { opacity: 0; transform: translateY(30px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* ===== HEADER ===== */
     header {
       text-align: center;
-      margin-bottom: 26px;
+      margin-bottom: 20px;
       position: relative;
     }
 
     h1 {
-      font-size: 2.7rem;
+      font-size: 2.5rem;
       font-weight: 700;
       letter-spacing: -1.2px;
       background: linear-gradient(90deg, var(--accent), #ff9ff3, #a29bfe);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       animation: titleGlow 3s ease-in-out infinite alternate;
     }
 
@@ -156,22 +134,26 @@
 
     .subtitle {
       color: var(--text-muted);
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 400;
     }
 
-    /* Botão de tema */
-    .theme-btn {
+    .header-actions {
       position: absolute;
       top: 0;
       right: 0;
-      width: 44px;
-      height: 44px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       border: 1px solid var(--glass-border);
       background: var(--key-bg);
       color: var(--text);
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -179,33 +161,38 @@
       transition: all 0.3s ease;
     }
 
-    .theme-btn:hover {
-      transform: rotate(20deg) scale(1.1);
+    .icon-btn:hover {
+      transform: scale(1.1);
       background: var(--accent);
       color: white;
       border-color: transparent;
     }
 
-    /* ===== TOP BAR ===== */
     .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 24px;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 8px;
       flex-wrap: wrap;
     }
 
     .stat {
       background: var(--key-bg);
       border: 1px solid var(--glass-border);
-      padding: 10px 18px;
+      padding: 8px 14px;
       border-radius: 50px;
-      font-size: 0.92rem;
+      font-size: 0.85rem;
       font-weight: 500;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       color: var(--text-muted);
       transition: all 0.3s ease;
     }
@@ -215,103 +202,108 @@
       font-weight: 600;
     }
 
-    .category-select {
+    .stat.streak strong { color: var(--warning); }
+
+    .controls-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    select {
       background: var(--key-bg);
       border: 1px solid var(--glass-border);
       color: var(--text);
-      padding: 10px 16px;
-      border-radius: 14px;
-      font-size: 0.92rem;
+      padding: 9px 14px;
+      border-radius: 12px;
+      font-size: 0.88rem;
       font-family: inherit;
       cursor: pointer;
       outline: none;
       transition: all 0.25s ease;
     }
 
-    .category-select:hover {
-      border-color: var(--accent);
-    }
+    select:hover { border-color: var(--accent); }
 
-    .category-select option {
+    select option {
       background: #1e1e2f;
       color: #fff;
     }
 
-    [data-theme="light"] .category-select option {
+    [data-theme="light"] select option {
       background: #fff;
       color: #2d3436;
     }
 
-    /* ===== GAME AREA ===== */
     .game-area {
       display: flex;
       flex-wrap: wrap;
-      gap: 28px;
+      gap: 24px;
       justify-content: center;
       align-items: flex-start;
     }
 
     .hangman-area {
-      flex: 0 0 220px;
+      flex: 0 0 200px;
       display: flex;
       justify-content: center;
     }
 
     .hangman-svg {
-      width: 200px;
-      height: 250px;
+      width: 190px;
+      height: 240px;
       filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
-      transition: filter 0.4s ease;
     }
 
     .play-area {
       flex: 1;
-      min-width: 290px;
+      min-width: 280px;
     }
 
     .info-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 14px;
-      font-size: 0.9rem;
+      margin-bottom: 12px;
+      font-size: 0.88rem;
       color: var(--text-muted);
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .info-row span {
       background: rgba(255, 107, 157, 0.15);
       color: var(--accent);
-      padding: 4px 14px;
+      padding: 4px 12px;
       border-radius: 20px;
       font-weight: 600;
-      font-size: 0.88rem;
-      transition: all 0.3s ease;
+      font-size: 0.85rem;
     }
 
     [data-theme="light"] .info-row span {
       background: rgba(232, 67, 147, 0.12);
     }
 
-    /* Dica */
     .hint-box {
       background: var(--hint-bg);
       border: 1px dashed var(--hint-border);
-      border-radius: 16px;
-      padding: 14px 18px;
-      margin-bottom: 20px;
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
       text-align: center;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: var(--hint-text);
-      min-height: 54px;
+      min-height: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all 0.4s ease;
-      line-height: 1.45;
+      line-height: 1.4;
     }
 
     .hint-box.active {
       border-style: solid;
-      box-shadow: 0 0 24px rgba(255, 107, 157, 0.18);
+      box-shadow: 0 0 20px rgba(255, 107, 157, 0.18);
       animation: hintPulse 0.5s ease;
     }
 
@@ -320,24 +312,23 @@
       100% { transform: scale(1); opacity: 1; }
     }
 
-    /* Palavra */
     .word-display {
       display: flex;
       justify-content: center;
-      gap: 9px;
+      gap: 8px;
       flex-wrap: wrap;
-      margin: 10px 0 26px;
-      min-height: 56px;
+      margin: 8px 0 22px;
+      min-height: 52px;
     }
 
     .letter-box {
-      width: 42px;
-      height: 52px;
+      width: 40px;
+      height: 50px;
       border-bottom: 3px solid rgba(255, 107, 157, 0.65);
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 1.85rem;
+      font-size: 1.75rem;
       font-weight: 600;
       color: var(--text);
       text-transform: uppercase;
@@ -362,30 +353,29 @@
 
     .letter-box.space {
       border-bottom: none;
-      width: 20px;
+      width: 18px;
     }
 
-    /* Teclado */
     .keyboard {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 7px;
       justify-content: center;
-      margin-bottom: 26px;
+      margin-bottom: 20px;
     }
 
     .key {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border: none;
-      border-radius: 12px;
+      border-radius: 11px;
       background: var(--key-bg);
       color: var(--text);
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 600;
       font-family: inherit;
       cursor: pointer;
-      transition: all 0.22s ease;
+      transition: all 0.2s ease;
       text-transform: uppercase;
       user-select: none;
       box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
@@ -395,15 +385,13 @@
       background: var(--accent);
       color: white;
       transform: translateY(-3px);
-      box-shadow: 0 6px 16px rgba(255, 107, 157, 0.4);
+      box-shadow: 0 6px 14px rgba(255, 107, 157, 0.4);
     }
 
-    .key:active:not(:disabled) {
-      transform: translateY(0);
-    }
+    .key:active:not(:disabled) { transform: translateY(0); }
 
     .key:disabled {
-      opacity: 0.32;
+      opacity: 0.3;
       cursor: not-allowed;
       transform: none !important;
       box-shadow: none;
@@ -412,7 +400,7 @@
     .key.correct {
       background: var(--success) !important;
       color: #fff !important;
-      box-shadow: 0 0 16px rgba(46, 213, 115, 0.45);
+      box-shadow: 0 0 14px rgba(46, 213, 115, 0.45);
       animation: keyCorrect 0.4s ease;
     }
 
@@ -436,37 +424,36 @@
       80% { transform: translateX(3px); }
     }
 
-    /* Botões */
     .controls {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       justify-content: center;
       flex-wrap: wrap;
     }
 
     .btn {
-      padding: 13px 24px;
+      padding: 12px 20px;
       border: none;
-      border-radius: 14px;
-      font-size: 0.95rem;
+      border-radius: 13px;
+      font-size: 0.92rem;
       font-weight: 600;
       font-family: inherit;
       cursor: pointer;
       transition: all 0.25s ease;
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
     }
 
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: white;
-      box-shadow: 0 4px 18px rgba(255, 107, 157, 0.35);
+      box-shadow: 0 4px 16px rgba(255, 107, 157, 0.35);
     }
 
     .btn-primary:hover {
       transform: translateY(-3px);
-      box-shadow: 0 8px 28px rgba(255, 107, 157, 0.45);
+      box-shadow: 0 8px 24px rgba(255, 107, 157, 0.45);
     }
 
     .btn-hint {
@@ -509,13 +496,12 @@
       box-shadow: none !important;
     }
 
-    /* Mensagem */
     .message {
       text-align: center;
-      margin-top: 22px;
-      font-size: 1.3rem;
+      margin-top: 18px;
+      font-size: 1.2rem;
       font-weight: 600;
-      min-height: 34px;
+      min-height: 32px;
       transition: all 0.35s ease;
     }
 
@@ -543,7 +529,6 @@
       80% { transform: translateX(4px); }
     }
 
-    /* Confetti */
     .confetti {
       position: fixed;
       width: 9px;
@@ -562,62 +547,126 @@
       }
     }
 
-    /* Responsivo */
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--bg-2);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 28px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: var(--card-shadow);
+      transform: translateY(20px) scale(0.96);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    [data-theme="light"] .modal {
+      background: #fff;
+    }
+
+    .modal h2 {
+      font-size: 1.4rem;
+      margin-bottom: 14px;
+      color: var(--accent);
+    }
+
+    .modal p, .modal li {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+
+    .modal ul {
+      padding-left: 18px;
+      margin-bottom: 16px;
+    }
+
+    .modal .btn {
+      width: 100%;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    /* Responsive */
     @media (max-width: 640px) {
       .container {
-        padding: 24px 16px;
-        border-radius: 24px;
+        padding: 20px 14px;
+        border-radius: 22px;
       }
-      h1 { font-size: 2rem; }
-      .theme-btn {
-        width: 38px;
-        height: 38px;
-        font-size: 1.1rem;
-      }
-      .key {
-        width: 36px;
-        height: 36px;
-        font-size: 0.95rem;
-      }
-      .letter-box {
-        width: 32px;
-        height: 44px;
-        font-size: 1.4rem;
-      }
-      .hangman-svg {
-        width: 160px;
-        height: 200px;
-      }
-      .btn {
-        padding: 11px 18px;
-        font-size: 0.9rem;
-      }
+      h1 { font-size: 1.85rem; }
+      .icon-btn { width: 36px; height: 36px; font-size: 1rem; }
+      .key { width: 34px; height: 34px; font-size: 0.9rem; }
+      .letter-box { width: 30px; height: 42px; font-size: 1.35rem; }
+      .hangman-svg { width: 150px; height: 190px; }
+      .btn { padding: 10px 16px; font-size: 0.88rem; }
+      .stat { padding: 7px 11px; font-size: 0.8rem; }
     }
   </style>
 </head>
 <body>
-  <!-- Partículas de fundo -->
   <div id="particles"></div>
 
   <div class="container">
     <header>
       <h1>Jogo da Forca</h1>
       <p class="subtitle">Adivinhe a palavra antes que o boneco seja enforcado</p>
-      <button class="theme-btn" id="theme-btn" title="Alternar tema">🌙</button>
+      <div class="header-actions">
+        <button class="icon-btn" id="sound-btn" title="Som">🔊</button>
+        <button class="icon-btn" id="help-btn" title="Como jogar">❓</button>
+        <button class="icon-btn" id="theme-btn" title="Alternar tema">🌙</button>
+      </div>
     </header>
 
     <div class="top-bar">
-      <div class="stat">⭐ Pontos: <strong id="score">0</strong></div>
-      <div class="stat">🏆 Recorde: <strong id="record">0</strong></div>
-      <select class="category-select" id="category-select">
-        <option value="random">🎲 Aleatório</option>
-        <option value="Animais">🐾 Animais</option>
-        <option value="Frutas">🍎 Frutas</option>
-        <option value="Países">🌍 Países</option>
-        <option value="Objetos">📦 Objetos</option>
-        <option value="Profissões">💼 Profissões</option>
-        <option value="Esportes">⚽ Esportes</option>
-      </select>
+      <div class="stats-row">
+        <div class="stat">⭐ <strong id="score">0</strong></div>
+        <div class="stat">🏆 <strong id="record">0</strong></div>
+        <div class="stat streak">🔥 <strong id="streak">0</strong></div>
+        <div class="stat">🎮 <strong id="games">0</strong></div>
+      </div>
+      <div class="controls-row">
+        <select id="category-select">
+          <option value="random">🎲 Aleatório</option>
+          <option value="Animais">🐾 Animais</option>
+          <option value="Frutas">🍎 Frutas</option>
+          <option value="Países">🌍 Países</option>
+          <option value="Objetos">📦 Objetos</option>
+          <option value="Profissões">💼 Profissões</option>
+          <option value="Esportes">⚽ Esportes</option>
+          <option value="Tecnologia">💻 Tecnologia</option>
+          <option value="Comidas">🍕 Comidas</option>
+        </select>
+        <select id="difficulty-select">
+          <option value="easy">😊 Fácil</option>
+          <option value="medium" selected>😐 Médio</option>
+          <option value="hard">😤 Difícil</option>
+        </select>
+      </div>
     </div>
 
     <div class="game-area">
@@ -650,6 +699,7 @@
         <div class="info-row">
           <div>Erros: <span id="errors">0 / 6</span></div>
           <div>Usadas: <span id="used-letters">—</span></div>
+          <div>Categoria: <span id="current-category">—</span></div>
         </div>
 
         <div class="hint-box" id="hint-box">
@@ -662,11 +712,33 @@
         <div class="controls">
           <button class="btn btn-primary" id="new-game-btn">Nova Palavra</button>
           <button class="btn btn-hint" id="hint-btn">💡 Dica</button>
-          <button class="btn btn-secondary" id="reveal-btn" disabled>Revelar Letra</button>
+          <button class="btn btn-secondary" id="reveal-btn" disabled>Revelar (−15 pts)</button>
         </div>
 
         <div class="message" id="message"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal Como Jogar -->
+  <div class="modal-overlay" id="help-modal">
+    <div class="modal">
+      <h2>Como Jogar</h2>
+      <ul>
+        <li>Escolha uma categoria e dificuldade.</li>
+        <li>Clique nas letras ou use o teclado físico.</li>
+        <li>Você tem 6 erros no máximo (Médio).</li>
+        <li><strong>Dica</strong> mostra uma pista (custa menos pontos).</li>
+        <li><strong>Revelar</strong> mostra uma letra aleatória (−15 pontos).</li>
+        <li>Quanto menos erros e dicas, mais pontos você ganha.</li>
+        <li>Mantenha a sequência de vitórias para subir o placar!</li>
+      </ul>
+      <p style="font-size:0.85rem;opacity:0.8">Dificuldades:<br>
+        😊 Fácil → palavras curtas + 7 erros<br>
+        😐 Médio → padrão + 6 erros<br>
+        😤 Difícil → palavras longas + 5 erros
+      </p>
+      <button class="btn btn-primary" id="close-help">Entendi!</button>
     </div>
   </div>
 
@@ -675,8 +747,7 @@
     function createParticles() {
       const container = document.getElementById("particles");
       container.innerHTML = "";
-      const count = window.innerWidth < 600 ? 18 : 32;
-
+      const count = window.innerWidth < 600 ? 16 : 28;
       for (let i = 0; i < count; i++) {
         const p = document.createElement("div");
         p.className = "particle";
@@ -689,7 +760,6 @@
         container.appendChild(p);
       }
     }
-
     createParticles();
     window.addEventListener("resize", createParticles);
 
@@ -702,116 +772,26 @@
       themeBtn.textContent = theme === "light" ? "☀️" : "🌙";
       localStorage.setItem("forcaTheme", theme);
     }
-
     applyTheme(savedTheme);
-
     themeBtn.addEventListener("click", () => {
       const current = localStorage.getItem("forcaTheme") || "dark";
       applyTheme(current === "dark" ? "light" : "dark");
     });
 
-    // ===== BANCO DE PALAVRAS =====
-    const words = {
-      "Animais": {
-        "ELEFANTE": "Maior animal terrestre, tem tromba e grandes orelhas",
-        "GIRAFA": "Animal mais alto do mundo, com pescoço bem longo",
-        "TIGRE": "Felino listrado de laranja e preto, vive na Ásia",
-        "LEAO": "Conhecido como o rei da selva, tem uma grande juba",
-        "MACACO": "Animal que vive em árvores e é parecido com o ser humano",
-        "CACHORRO": "Melhor amigo do homem, late e abana o rabo",
-        "GATO": "Animal doméstico que mia e adora caçar ratos",
-        "COELHO": "Animal de orelhas longas que pula e come cenoura",
-        "PAPAGAIO": "Ave colorida que consegue imitar a fala humana",
-        "CROCODILO": "Réptil grande de água doce com muitos dentes afiados"
-      },
-      "Frutas": {
-        "BANANA": "Fruta amarela alongada, muito comum no café da manhã",
-        "LARANJA": "Fruta cítrica redonda e suculenta, rica em vitamina C",
-        "MORANGO": "Fruta vermelha pequena com sementes por fora",
-        "ABACAXI": "Fruta tropical com casca espinhosa e coroa de folhas",
-        "MELANCIA": "Fruta grande, verde por fora e vermelha por dentro no verão",
-        "UVA": "Fruta pequena que cresce em cachos e pode ser verde ou roxa",
-        "MANGA": "Fruta tropical doce de polpa amarela ou alaranjada",
-        "PESSEGO": "Fruta aveludada de cor rosada/alaranjada com caroço",
-        "KIWI": "Fruta pequena marrom por fora e verde por dentro com sementes pretas",
-        "COCO": "Fruta com casca dura e água doce no interior"
-      },
-      "Países": {
-        "BRASIL": "Maior país da América do Sul, fala português",
-        "ARGENTINA": "País vizinho do Brasil famoso pelo tango e pelo futebol",
-        "PORTUGAL": "País europeu de onde veio a língua portuguesa",
-        "ESPANHA": "País europeu famoso pela paella e pelas touradas",
-        "FRANCA": "País europeu conhecido pela Torre Eiffel e pelo vinho",
-        "ITALIA": "País em formato de bota, famoso pela pizza e pelo macarrão",
-        "JAPAO": "País asiático das tecnologias e do sushi",
-        "CANADA": "País da América do Norte famoso pelo xarope de bordo e pelo frio",
-        "MEXICO": "País da América do Norte conhecido pelos tacos e pelo Dia dos Mortos",
-        "CHILE": "País longo e estreito da América do Sul, entre os Andes e o Pacífico"
-      },
-      "Objetos": {
-        "CADEIRA": "Móvel usado para sentar, tem encosto e pernas",
-        "MESA": "Móvel plano usado para colocar objetos ou fazer refeições",
-        "COMPUTADOR": "Máquina eletrônica usada para trabalhar, estudar e jogar",
-        "TELEFONE": "Aparelho usado para fazer ligações e enviar mensagens",
-        "LIVRO": "Conjunto de páginas com texto ou imagens para leitura",
-        "CANETA": "Instrumento usado para escrever com tinta",
-        "RELOGIO": "Objeto usado para marcar as horas",
-        "OCULOS": "Acessório usado no rosto para melhorar a visão",
-        "MOCHILA": "Bolsa que se carrega nas costas, usada por estudantes",
-        "CHAVE": "Objeto de metal usado para abrir fechaduras"
-      },
-      "Profissões": {
-        "MEDICO": "Profissional que cuida da saúde e trata doenças",
-        "PROFESSOR": "Pessoa que ensina alunos em escolas ou universidades",
-        "ENGENHEIRO": "Profissional que projeta e constrói máquinas, pontes e prédios",
-        "ADVOGADO": "Profissional que defende pessoas na justiça",
-        "BOMBEIRO": "Profissional que apaga incêndios e faz resgates",
-        "POLICIAL": "Profissional responsável por manter a ordem e a segurança",
-        "COZINHEIRO": "Pessoa que prepara refeições em restaurantes",
-        "PILOTO": "Profissional que dirige aviões ou helicópteros",
-        "JORNALISTA": "Pessoa que escreve notícias e reportagens",
-        "ARQUITETO": "Profissional que projeta casas e edifícios"
-      },
-      "Esportes": {
-        "FUTEBOL": "Esporte mais popular do Brasil, jogado com uma bola nos pés",
-        "BASQUETE": "Esporte em que se joga a bola em uma cesta alta",
-        "VOLEI": "Esporte em que se joga a bola por cima de uma rede com as mãos",
-        "TENIS": "Esporte jogado com raquete e uma bolinha amarela",
-        "NATACAO": "Esporte praticado dentro da água, em piscinas",
-        "ATLETISMO": "Conjunto de provas de corrida, salto e arremesso",
-        "HANDEBOL": "Esporte parecido com o futebol, mas jogado com as mãos",
-        "CICLISMO": "Esporte praticado com bicicleta",
-        "SURFE": "Esporte praticado no mar em cima de uma prancha",
-        "BOXE": "Esporte de luta em que se usa luvas e se luta no ringue"
-      }
-    };
+    // ===== SOM =====
+    let soundEnabled = localStorage.getItem("forcaSound") !== "off";
+    const soundBtn = document.getElementById("sound-btn");
+    soundBtn.textContent = soundEnabled ? "🔊" : "🔇";
 
-    // ===== ESTADO =====
-    let selectedWord = "", selectedCategory = "", selectedHint = "";
-    let guessedLetters = [], wrongGuesses = 0, gameOver = false, hintLevel = 0;
-    let score = 0;
-    let record = parseInt(localStorage.getItem("forcaRecord") || "0");
-    const maxWrong = 6;
+    soundBtn.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem("forcaSound", soundEnabled ? "on" : "off");
+      soundBtn.textContent = soundEnabled ? "🔊" : "🔇";
+    });
 
-    const wordDisplay = document.getElementById("word-display");
-    const keyboard = document.getElementById("keyboard");
-    const errorsEl = document.getElementById("errors");
-    const usedLettersEl = document.getElementById("used-letters");
-    const messageEl = document.getElementById("message");
-    const hintBox = document.getElementById("hint-box");
-    const newGameBtn = document.getElementById("new-game-btn");
-    const hintBtn = document.getElementById("hint-btn");
-    const revealBtn = document.getElementById("reveal-btn");
-    const scoreEl = document.getElementById("score");
-    const recordEl = document.getElementById("record");
-    const categorySelect = document.getElementById("category-select");
-
-    const hangmanParts = ["head", "body", "armL", "armR", "legL", "legR"];
-    recordEl.textContent = record;
-
-    // Áudio
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playTone(freq, type, duration, volume = 0.11) {
+      if (!soundEnabled) return;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = type;
@@ -828,9 +808,183 @@
     function playWin() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => playTone(f, "sine", 0.16, 0.09), i * 100)); }
     function playLose() { playTone(280, "sawtooth", 0.3, 0.09); setTimeout(() => playTone(180, "sawtooth", 0.4, 0.07), 160); }
 
+    // ===== BANCO DE PALAVRAS (expandido) =====
+    const words = {
+      "Animais": {
+        "ELEFANTE": "Maior animal terrestre, tem tromba e grandes orelhas",
+        "GIRAFA": "Animal mais alto do mundo, com pescoço bem longo",
+        "TIGRE": "Felino listrado de laranja e preto, vive na Ásia",
+        "LEAO": "Conhecido como o rei da selva, tem uma grande juba",
+        "MACACO": "Animal que vive em árvores e é parecido com o ser humano",
+        "CACHORRO": "Melhor amigo do homem, late e abana o rabo",
+        "GATO": "Animal doméstico que mia e adora caçar ratos",
+        "COELHO": "Animal de orelhas longas que pula e come cenoura",
+        "PAPAGAIO": "Ave colorida que consegue imitar a fala humana",
+        "CROCODILO": "Réptil grande de água doce com muitos dentes afiados",
+        "PANDA": "Urso preto e branco que come bambu",
+        "PINGUIM": "Ave que não voa e vive no frio extremo",
+        "BALEIA": "Maior animal do planeta, vive nos oceanos",
+        "TUBARAO": "Predador marinho com várias fileiras de dentes",
+        "CORUJA": "Ave noturna conhecida pela sabedoria"
+      },
+      "Frutas": {
+        "BANANA": "Fruta amarela alongada, muito comum no café da manhã",
+        "LARANJA": "Fruta cítrica redonda e suculenta, rica em vitamina C",
+        "MORANGO": "Fruta vermelha pequena com sementes por fora",
+        "ABACAXI": "Fruta tropical com casca espinhosa e coroa de folhas",
+        "MELANCIA": "Fruta grande, verde por fora e vermelha por dentro",
+        "UVA": "Fruta pequena que cresce em cachos",
+        "MANGA": "Fruta tropical doce de polpa amarela ou alaranjada",
+        "PESSEGO": "Fruta aveludada de cor rosada/alaranjada",
+        "KIWI": "Fruta pequena marrom por fora e verde por dentro",
+        "COCO": "Fruta com casca dura e água doce no interior",
+        "GOIABA": "Fruta tropical com sementes no centro e polpa rosa ou branca",
+        "LIMAO": "Fruta cítrica azeda, muito usada em sucos e temperos",
+        "CEREJA": "Fruta pequena, vermelha e doce, com caroço",
+        "AMEIXA": "Fruta de casca roxa ou vermelha, suculenta",
+        "FIGO": "Fruta doce com polpa rosada e sementes pequenas"
+      },
+      "Países": {
+        "BRASIL": "Maior país da América do Sul, fala português",
+        "ARGENTINA": "País vizinho do Brasil famoso pelo tango e futebol",
+        "PORTUGAL": "País europeu de onde veio a língua portuguesa",
+        "ESPANHA": "País europeu famoso pela paella e pelas touradas",
+        "FRANCA": "País europeu conhecido pela Torre Eiffel e pelo vinho",
+        "ITALIA": "País em formato de bota, famoso pela pizza",
+        "JAPAO": "País asiático das tecnologias e do sushi",
+        "CANADA": "País da América do Norte famoso pelo xarope de bordo",
+        "MEXICO": "País conhecido pelos tacos e pelo Dia dos Mortos",
+        "CHILE": "País longo e estreito entre os Andes e o Pacífico",
+        "ALEMANHA": "País europeu famoso pelas cervejas e pela engenharia",
+        "AUSTRALIA": "País-continente famoso pelos cangurus e coalas",
+        "EGITO": "País africano das pirâmides e do Rio Nilo",
+        "INDIA": "País asiático com mais de um bilhão de habitantes",
+        "HOLANDA": "País europeu famoso pelas tulipas e pelos moinhos"
+      },
+      "Objetos": {
+        "CADEIRA": "Móvel usado para sentar, tem encosto e pernas",
+        "MESA": "Móvel plano usado para colocar objetos ou refeições",
+        "COMPUTADOR": "Máquina eletrônica usada para trabalhar e jogar",
+        "TELEFONE": "Aparelho usado para fazer ligações e mensagens",
+        "LIVRO": "Conjunto de páginas com texto ou imagens",
+        "CANETA": "Instrumento usado para escrever com tinta",
+        "RELOGIO": "Objeto usado para marcar as horas",
+        "OCULOS": "Acessório usado no rosto para melhorar a visão",
+        "MOCHILA": "Bolsa que se carrega nas costas",
+        "CHAVE": "Objeto de metal usado para abrir fechaduras",
+        "TESOURA": "Ferramenta com duas lâminas usada para cortar",
+        "GARFO": "Talher com dentes usado para pegar comida",
+        "TRAVESSEIRO": "Objeto macio colocado sob a cabeça para dormir",
+        "ESPELHO": "Superfície que reflete a imagem de quem olha",
+        "LANTERNA": "Objeto portátil que produz luz"
+      },
+      "Profissões": {
+        "MEDICO": "Profissional que cuida da saúde e trata doenças",
+        "PROFESSOR": "Pessoa que ensina alunos em escolas",
+        "ENGENHEIRO": "Profissional que projeta máquinas e construções",
+        "ADVOGADO": "Profissional que defende pessoas na justiça",
+        "BOMBEIRO": "Profissional que apaga incêndios e faz resgates",
+        "POLICIAL": "Profissional responsável pela ordem e segurança",
+        "COZINHEIRO": "Pessoa que prepara refeições em restaurantes",
+        "PILOTO": "Profissional que dirige aviões ou helicópteros",
+        "JORNALISTA": "Pessoa que escreve notícias e reportagens",
+        "ARQUITETO": "Profissional que projeta casas e edifícios",
+        "DENTISTA": "Profissional que cuida dos dentes e da boca",
+        "ENFERMEIRO": "Profissional que auxilia no cuidado de pacientes",
+        "MOTORISTA": "Pessoa que dirige veículos de transporte",
+        "VENDEDOR": "Pessoa que oferece produtos ou serviços",
+        "CIENTISTA": "Pessoa que realiza pesquisas e experimentos"
+      },
+      "Esportes": {
+        "FUTEBOL": "Esporte mais popular do Brasil, jogado com os pés",
+        "BASQUETE": "Esporte em que se joga a bola em uma cesta alta",
+        "VOLEI": "Esporte em que se joga a bola por cima de uma rede",
+        "TENIS": "Esporte jogado com raquete e bolinha amarela",
+        "NATACAO": "Esporte praticado dentro da água",
+        "ATLETISMO": "Conjunto de provas de corrida, salto e arremesso",
+        "HANDEBOL": "Esporte parecido com o futebol, mas com as mãos",
+        "CICLISMO": "Esporte praticado com bicicleta",
+        "SURFE": "Esporte praticado no mar em cima de uma prancha",
+        "BOXE": "Esporte de luta com luvas no ringue",
+        "JUDO": "Arte marcial japonesa de projeções e imobilizações",
+        "GOLFE": "Esporte em que se acerta uma bolinha em buracos",
+        "ESGRIMA": "Esporte de combate com espadas",
+        "RUGBY": "Esporte de contato jogado com bola oval",
+        "SKATE": "Esporte urbano praticado sobre um shape com rodinhas"
+      },
+      "Tecnologia": {
+        "SMARTPHONE": "Celular inteligente com tela sensível ao toque",
+        "INTERNET": "Rede mundial de computadores",
+        "ROBO": "Máquina programada para realizar tarefas",
+        "SOFTWARE": "Conjunto de programas de um computador",
+        "HARDWARE": "Parte física de um computador ou dispositivo",
+        "ALGORITMO": "Sequência de passos para resolver um problema",
+        "NUVEM": "Armazenamento de dados pela internet",
+        "SENHA": "Código secreto usado para acessar contas",
+        "TECLADO": "Dispositivo usado para digitar",
+        "MONITOR": "Tela que mostra imagens do computador",
+        "IMPRESSORA": "Aparelho que imprime documentos no papel",
+        "DRONE": "Aeronave sem piloto controlada remotamente",
+        "BATERIAS": "Fonte de energia portátil para aparelhos",
+        "WIFI": "Conexão sem fio com a internet",
+        "PIXEL": "Menor unidade de uma imagem digital"
+      },
+      "Comidas": {
+        "PIZZA": "Massa redonda coberta com molho, queijo e outros ingredientes",
+        "HAMBURGUER": "Sanduíche com carne moída e pão",
+        "LASANHA": "Prato italiano com camadas de massa, molho e queijo",
+        "SUSHI": "Comida japonesa com arroz e peixe cru",
+        "FEIJOADA": "Prato brasileiro com feijão preto e carnes",
+        "CHURRASCO": "Carne assada na brasa, muito popular no Brasil",
+        "SORVETE": "Doce gelado de vários sabores",
+        "BOLO": "Doce assado, comum em aniversários",
+        "MACARRAO": "Massa italiana servida com diversos molhos",
+        "SALADA": "Prato leve feito principalmente com vegetais",
+        "OMELETE": "Ovos batidos e fritos, às vezes com recheio",
+        "RISOTO": "Prato italiano cremoso feito com arroz",
+        "TACOS": "Comida mexicana com tortilla e recheios",
+        "PAO": "Alimento básico feito de farinha e fermento",
+        "CHOCOLATE": "Doce feito a partir do cacau"
+      }
+    };
+
+    // ===== ESTADO =====
+    let selectedWord = "", selectedCategory = "", selectedHint = "";
+    let guessedLetters = [], wrongGuesses = 0, gameOver = false, hintLevel = 0;
+    let score = parseInt(localStorage.getItem("forcaScore") || "0");
+    let record = parseInt(localStorage.getItem("forcaRecord") || "0");
+    let streak = parseInt(localStorage.getItem("forcaStreak") || "0");
+    let games = parseInt(localStorage.getItem("forcaGames") || "0");
+    let maxWrong = 6;
+
+    const wordDisplay = document.getElementById("word-display");
+    const keyboard = document.getElementById("keyboard");
+    const errorsEl = document.getElementById("errors");
+    const usedLettersEl = document.getElementById("used-letters");
+    const messageEl = document.getElementById("message");
+    const hintBox = document.getElementById("hint-box");
+    const newGameBtn = document.getElementById("new-game-btn");
+    const hintBtn = document.getElementById("hint-btn");
+    const revealBtn = document.getElementById("reveal-btn");
+    const scoreEl = document.getElementById("score");
+    const recordEl = document.getElementById("record");
+    const streakEl = document.getElementById("streak");
+    const gamesEl = document.getElementById("games");
+    const categorySelect = document.getElementById("category-select");
+    const difficultySelect = document.getElementById("difficulty-select");
+    const currentCategoryEl = document.getElementById("current-category");
+
+    const hangmanParts = ["head", "body", "armL", "armR", "legL", "legR"];
+
+    // Atualiza placares
+    scoreEl.textContent = score;
+    recordEl.textContent = record;
+    streakEl.textContent = streak;
+    gamesEl.textContent = games;
+
     function createConfetti() {
       const colors = ["#ff6b9d", "#2ed573", "#54a0ff", "#feca57", "#5f27cd", "#ff9ff3", "#48dbfb"];
-      for (let i = 0; i < 80; i++) {
+      for (let i = 0; i < 90; i++) {
         const conf = document.createElement("div");
         conf.className = "confetti";
         conf.style.left = Math.random() * 100 + "vw";
@@ -856,14 +1010,34 @@
       });
     }
 
+    function getDifficultySettings() {
+      const diff = difficultySelect.value;
+      if (diff === "easy") return { maxWrong: 7, minLen: 4, maxLen: 7 };
+      if (diff === "hard") return { maxWrong: 5, minLen: 7, maxLen: 20 };
+      return { maxWrong: 6, minLen: 5, maxLen: 12 }; // medium
+    }
+
     function pickRandomWord() {
+      const settings = getDifficultySettings();
+      maxWrong = settings.maxWrong;
+
       let cat = categorySelect.value;
       if (cat === "random") {
         const cats = Object.keys(words);
         cat = cats[Math.floor(Math.random() * cats.length)];
       }
       selectedCategory = cat;
-      const list = Object.keys(words[cat]);
+      currentCategoryEl.textContent = cat;
+
+      // Filtra palavras pela dificuldade
+      let list = Object.keys(words[cat]).filter(w => {
+        const len = w.replace(/ /g, "").length;
+        return len >= settings.minLen && len <= settings.maxLen;
+      });
+
+      // Fallback se não houver palavras na faixa
+      if (list.length === 0) list = Object.keys(words[cat]);
+
       selectedWord = list[Math.floor(Math.random() * list.length)];
       selectedHint = words[cat][selectedWord];
     }
@@ -887,7 +1061,7 @@
       hangmanParts.forEach((part, i) => {
         document.getElementById(part).style.display = i < wrongGuesses ? "block" : "none";
       });
-      document.getElementById("face").style.display = wrongGuesses >= 6 ? "block" : "none";
+      document.getElementById("face").style.display = wrongGuesses >= maxWrong ? "block" : "none";
     }
 
     function updateInfo() {
@@ -902,12 +1076,12 @@
       if (keyBtn) keyBtn.disabled = true;
 
       if (selectedWord.includes(letter)) {
-        keyBtn.classList.add("correct");
+        if (keyBtn) keyBtn.classList.add("correct");
         playCorrect();
         displayWord();
         checkWin();
       } else {
-        keyBtn.classList.add("wrong");
+        if (keyBtn) keyBtn.classList.add("wrong");
         wrongGuesses++;
         playWrong();
         updateHangman();
@@ -920,15 +1094,33 @@
       const won = selectedWord.split("").every(c => c === " " || guessedLetters.includes(c));
       if (won) {
         gameOver = true;
-        const points = Math.max(10, 55 - wrongGuesses * 8 - hintLevel * 9);
+        // Pontuação: base + bônus por poucos erros e dicas
+        let points = 40 + (maxWrong - wrongGuesses) * 12;
+        if (hintLevel === 0) points += 25;
+        else if (hintLevel === 1) points += 10;
+        // Bônus de dificuldade
+        if (difficultySelect.value === "hard") points = Math.round(points * 1.4);
+        else if (difficultySelect.value === "easy") points = Math.round(points * 0.8);
+
         score += points;
-        scoreEl.textContent = score;
+        streak++;
+        games++;
+
+        localStorage.setItem("forcaScore", score);
+        localStorage.setItem("forcaStreak", streak);
+        localStorage.setItem("forcaGames", games);
+
         if (score > record) {
           record = score;
           localStorage.setItem("forcaRecord", record);
           recordEl.textContent = record;
         }
-        messageEl.textContent = `Parabéns! Você venceu  +${points} pontos`;
+
+        scoreEl.textContent = score;
+        streakEl.textContent = streak;
+        gamesEl.textContent = games;
+
+        messageEl.textContent = `Parabéns! +${points} pontos 🔥 Sequência: ${streak}`;
         messageEl.className = "message win";
         disableAll();
         playWin();
@@ -939,9 +1131,16 @@
     function checkLose() {
       if (wrongGuesses >= maxWrong) {
         gameOver = true;
+        streak = 0;
+        games++;
+        localStorage.setItem("forcaStreak", 0);
+        localStorage.setItem("forcaGames", games);
+        streakEl.textContent = 0;
+        gamesEl.textContent = games;
+
         messageEl.textContent = `Você perdeu! A palavra era: ${selectedWord}`;
         messageEl.className = "message lose";
-        guessedLetters = [...new Set(selectedWord.split(""))];
+        guessedLetters = [...new Set(selectedWord.split("").filter(c => c !== " "))];
         displayWord();
         disableAll();
         playLose();
@@ -967,6 +1166,12 @@
       if (gameOver || hintLevel >= 2) return;
       const remaining = selectedWord.split("").filter(c => c !== " " && !guessedLetters.includes(c));
       if (!remaining.length) return;
+
+      // Custa pontos
+      score = Math.max(0, score - 15);
+      scoreEl.textContent = score;
+      localStorage.setItem("forcaScore", score);
+
       const letter = remaining[Math.floor(Math.random() * remaining.length)];
       handleGuess(letter);
       hintLevel = 2;
@@ -986,7 +1191,7 @@
       hintBox.classList.remove("active");
       hintBtn.disabled = false;
       revealBtn.disabled = true;
-      revealBtn.textContent = "Revelar Letra";
+      revealBtn.textContent = "Revelar (−15 pts)";
 
       pickRandomWord();
       displayWord();
@@ -995,16 +1200,27 @@
       initKeyboard();
     }
 
+    // Eventos
     newGameBtn.addEventListener("click", startNewGame);
     hintBtn.addEventListener("click", giveHint);
     revealBtn.addEventListener("click", revealLetter);
     categorySelect.addEventListener("change", startNewGame);
+    difficultySelect.addEventListener("change", startNewGame);
 
     document.addEventListener("keydown", e => {
       const letter = e.key.toUpperCase();
       if (/^[A-Z]$/.test(letter)) handleGuess(letter);
     });
 
+    // Modal
+    const helpModal = document.getElementById("help-modal");
+    document.getElementById("help-btn").addEventListener("click", () => helpModal.classList.add("open"));
+    document.getElementById("close-help").addEventListener("click", () => helpModal.classList.remove("open"));
+    helpModal.addEventListener("click", e => {
+      if (e.target === helpModal) helpModal.classList.remove("open");
+    });
+
+    // Inicia
     startNewGame();
   </script>
 </body>
