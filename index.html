@@ -204,6 +204,11 @@
 
     .stat.streak strong { color: var(--warning); }
 
+    #lives {
+      letter-spacing: 2px;
+      font-size: 0.95rem;
+    }
+
     .controls-row {
       display: flex;
       gap: 8px;
@@ -647,7 +652,9 @@
         <div class="stat">⭐ <strong id="score">0</strong></div>
         <div class="stat">🏆 <strong id="record">0</strong></div>
         <div class="stat streak">🔥 <strong id="streak">0</strong></div>
+        <div class="stat">🏅 <strong id="best-streak">0</strong></div>
         <div class="stat">🎮 <strong id="games">0</strong></div>
+        <div class="stat">📈 <strong id="winrate">0%</strong></div>
       </div>
       <div class="controls-row">
         <select id="category-select">
@@ -660,6 +667,8 @@
           <option value="Esportes">⚽ Esportes</option>
           <option value="Tecnologia">💻 Tecnologia</option>
           <option value="Comidas">🍕 Comidas</option>
+          <option value="Filmes">🎬 Filmes</option>
+          <option value="Cores">🎨 Cores</option>
         </select>
         <select id="difficulty-select">
           <option value="easy">😊 Fácil</option>
@@ -697,7 +706,7 @@
 
       <div class="play-area">
         <div class="info-row">
-          <div>Erros: <span id="errors">0 / 6</span></div>
+          <div>Vidas: <span id="lives">❤️❤️❤️❤️❤️❤️</span></div>
           <div>Usadas: <span id="used-letters">—</span></div>
           <div>Categoria: <span id="current-category">—</span></div>
         </div>
@@ -713,6 +722,7 @@
           <button class="btn btn-primary" id="new-game-btn">Nova Palavra</button>
           <button class="btn btn-hint" id="hint-btn">💡 Dica</button>
           <button class="btn btn-secondary" id="reveal-btn" disabled>Revelar (−15 pts)</button>
+          <button class="btn btn-secondary" id="guess-word-btn">🎯 Chutar palavra</button>
         </div>
 
         <div class="message" id="message"></div>
@@ -727,18 +737,19 @@
       <ul>
         <li>Escolha uma categoria e dificuldade.</li>
         <li>Clique nas letras ou use o teclado físico.</li>
-        <li>Você tem 6 erros no máximo (Médio).</li>
-        <li><strong>Dica</strong> mostra uma pista (custa menos pontos).</li>
+        <li><strong>Dica</strong> mostra uma pista (reduz a pontuação).</li>
         <li><strong>Revelar</strong> mostra uma letra aleatória (−15 pontos).</li>
+        <li><strong>Chutar palavra</strong> tenta adivinhar a palavra inteira (acerto dá bônus, erro perde na hora).</li>
         <li>Quanto menos erros e dicas, mais pontos você ganha.</li>
-        <li>Mantenha a sequência de vitórias para subir o placar!</li>
+        <li>Mantenha a sequência de vitórias!</li>
       </ul>
-      <p style="font-size:0.85rem;opacity:0.8">Dificuldades:<br>
-        😊 Fácil → palavras curtas + 7 erros<br>
-        😐 Médio → padrão + 6 erros<br>
-        😤 Difícil → palavras longas + 5 erros
+      <p style="font-size:0.85rem;opacity:0.8;margin-bottom:14px">Dificuldades:<br>
+        😊 Fácil → palavras curtas + 7 vidas<br>
+        😐 Médio → padrão + 6 vidas<br>
+        😤 Difícil → palavras longas + apenas 4 vidas
       </p>
-      <button class="btn btn-primary" id="close-help">Entendi!</button>
+      <button class="btn btn-primary" id="close-help" style="margin-bottom:8px">Entendi!</button>
+      <button class="btn btn-secondary" id="reset-stats-btn">🗑️ Zerar Estatísticas</button>
     </div>
   </div>
 
@@ -808,7 +819,7 @@
     function playWin() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => playTone(f, "sine", 0.16, 0.09), i * 100)); }
     function playLose() { playTone(280, "sawtooth", 0.3, 0.09); setTimeout(() => playTone(180, "sawtooth", 0.4, 0.07), 160); }
 
-    // ===== BANCO DE PALAVRAS (expandido) =====
+    // ===== BANCO DE PALAVRAS =====
     const words = {
       "Animais": {
         "ELEFANTE": "Maior animal terrestre, tem tromba e grandes orelhas",
@@ -945,6 +956,40 @@
         "TACOS": "Comida mexicana com tortilla e recheios",
         "PAO": "Alimento básico feito de farinha e fermento",
         "CHOCOLATE": "Doce feito a partir do cacau"
+      },
+      "Filmes": {
+        "TITANIC": "Filme sobre o naufrágio do famoso navio",
+        "MATRIX": "Filme de ficção científica com Neo e a realidade virtual",
+        "AVATAR": "Filme de James Cameron com o planeta Pandora",
+        "FROZEN": "Animação da Disney sobre duas irmãs e poderes de gelo",
+        "BATMAN": "Herói de Gotham que luta contra o crime",
+        "SUPERMAN": "Herói de Krypton com capa vermelha",
+        "HOMEMARANHA": "Herói que escala paredes e lança teias",
+        "TOYSTORY": "Animação sobre brinquedos que ganham vida",
+        "REILEAO": "Animação da Disney sobre um leão chamado Simba",
+        "HARRYPOTTER": "Saga do jovem bruxo da escola de Hogwarts",
+        "STARWARS": "Saga espacial com jedis e o Lado Sombrio",
+        "JURASSIC": "Filme com dinossauros clonados em um parque",
+        "INDIANA": "Aventureiro com chapéu e chicote em busca de relíquias",
+        "SHREK": "Ogro verde que vive em um pântano",
+        "CORINGA": "Vilão do Batman interpretado por vários atores"
+      },
+      "Cores": {
+        "VERMELHO": "Cor do sangue, do fogo e das rosas",
+        "AZUL": "Cor do céu e do mar",
+        "VERDE": "Cor da natureza e das folhas",
+        "AMARELO": "Cor do sol e das bananas",
+        "ROXO": "Mistura de azul e vermelho, cor da realeza",
+        "LARANJA": "Cor da fruta de mesmo nome e do pôr do sol",
+        "ROSA": "Cor suave associada ao romantismo",
+        "PRETO": "Ausência de cor, oposto do branco",
+        "BRANCO": "Cor da neve e da paz",
+        "CINZA": "Cor entre o preto e o branco",
+        "MARROM": "Cor da terra e do chocolate",
+        "DOURADO": "Cor do ouro e do luxo",
+        "PRATEADO": "Cor da prata e dos metais brilhantes",
+        "TURQUESA": "Cor entre o azul e o verde, como o mar caribenho",
+        "BEGE": "Cor clara e neutra, parecida com a areia"
       }
     };
 
@@ -954,12 +999,14 @@
     let score = parseInt(localStorage.getItem("forcaScore") || "0");
     let record = parseInt(localStorage.getItem("forcaRecord") || "0");
     let streak = parseInt(localStorage.getItem("forcaStreak") || "0");
+    let bestStreak = parseInt(localStorage.getItem("forcaBestStreak") || "0");
     let games = parseInt(localStorage.getItem("forcaGames") || "0");
+    let wins = parseInt(localStorage.getItem("forcaWins") || "0");
     let maxWrong = 6;
 
     const wordDisplay = document.getElementById("word-display");
     const keyboard = document.getElementById("keyboard");
-    const errorsEl = document.getElementById("errors");
+    const livesEl = document.getElementById("lives");
     const usedLettersEl = document.getElementById("used-letters");
     const messageEl = document.getElementById("message");
     const hintBox = document.getElementById("hint-box");
@@ -969,18 +1016,25 @@
     const scoreEl = document.getElementById("score");
     const recordEl = document.getElementById("record");
     const streakEl = document.getElementById("streak");
+    const bestStreakEl = document.getElementById("best-streak");
     const gamesEl = document.getElementById("games");
+    const winrateEl = document.getElementById("winrate");
     const categorySelect = document.getElementById("category-select");
     const difficultySelect = document.getElementById("difficulty-select");
     const currentCategoryEl = document.getElementById("current-category");
 
     const hangmanParts = ["head", "body", "armL", "armR", "legL", "legR"];
 
-    // Atualiza placares
-    scoreEl.textContent = score;
-    recordEl.textContent = record;
-    streakEl.textContent = streak;
-    gamesEl.textContent = games;
+    function updateStatsDisplay() {
+      scoreEl.textContent = score;
+      recordEl.textContent = record;
+      streakEl.textContent = streak;
+      bestStreakEl.textContent = bestStreak;
+      gamesEl.textContent = games;
+      const rate = games > 0 ? Math.round((wins / games) * 100) : 0;
+      winrateEl.textContent = rate + "%";
+    }
+    updateStatsDisplay();
 
     function createConfetti() {
       const colors = ["#ff6b9d", "#2ed573", "#54a0ff", "#feca57", "#5f27cd", "#ff9ff3", "#48dbfb"];
@@ -1013,8 +1067,8 @@
     function getDifficultySettings() {
       const diff = difficultySelect.value;
       if (diff === "easy") return { maxWrong: 7, minLen: 4, maxLen: 7 };
-      if (diff === "hard") return { maxWrong: 5, minLen: 7, maxLen: 20 };
-      return { maxWrong: 6, minLen: 5, maxLen: 12 }; // medium
+      if (diff === "hard") return { maxWrong: 4, minLen: 8, maxLen: 20 };
+      return { maxWrong: 6, minLen: 5, maxLen: 12 };
     }
 
     function pickRandomWord() {
@@ -1029,13 +1083,11 @@
       selectedCategory = cat;
       currentCategoryEl.textContent = cat;
 
-      // Filtra palavras pela dificuldade
       let list = Object.keys(words[cat]).filter(w => {
         const len = w.replace(/ /g, "").length;
         return len >= settings.minLen && len <= settings.maxLen;
       });
 
-      // Fallback se não houver palavras na faixa
       if (list.length === 0) list = Object.keys(words[cat]);
 
       selectedWord = list[Math.floor(Math.random() * list.length)];
@@ -1059,13 +1111,29 @@
 
     function updateHangman() {
       hangmanParts.forEach((part, i) => {
-        document.getElementById(part).style.display = i < wrongGuesses ? "block" : "none";
+        const el = document.getElementById(part);
+        if (i < wrongGuesses) {
+          if (el.style.display === "none") {
+            el.style.display = "block";
+            el.style.opacity = "0";
+            el.style.transition = "opacity 0.35s ease";
+            requestAnimationFrame(() => { el.style.opacity = "1"; });
+          }
+        } else {
+          el.style.display = "none";
+          el.style.opacity = "0";
+        }
       });
       document.getElementById("face").style.display = wrongGuesses >= maxWrong ? "block" : "none";
     }
 
+    function updateLives() {
+      const remaining = Math.max(0, maxWrong - wrongGuesses);
+      livesEl.textContent = "❤️".repeat(remaining) + "🖤".repeat(wrongGuesses);
+    }
+
     function updateInfo() {
-      errorsEl.textContent = `${wrongGuesses} / ${maxWrong}`;
+      updateLives();
       usedLettersEl.textContent = guessedLetters.length ? guessedLetters.join(" ") : "—";
     }
 
@@ -1094,37 +1162,48 @@
       const won = selectedWord.split("").every(c => c === " " || guessedLetters.includes(c));
       if (won) {
         gameOver = true;
-        // Pontuação: base + bônus por poucos erros e dicas
         let points = 40 + (maxWrong - wrongGuesses) * 12;
         if (hintLevel === 0) points += 25;
         else if (hintLevel === 1) points += 10;
-        // Bônus de dificuldade
-        if (difficultySelect.value === "hard") points = Math.round(points * 1.4);
+        if (difficultySelect.value === "hard") points = Math.round(points * 1.6);
         else if (difficultySelect.value === "easy") points = Math.round(points * 0.8);
 
         score += points;
         streak++;
+        wins++;
         games++;
+
+        if (streak > bestStreak) {
+          bestStreak = streak;
+          localStorage.setItem("forcaBestStreak", bestStreak);
+        }
 
         localStorage.setItem("forcaScore", score);
         localStorage.setItem("forcaStreak", streak);
+        localStorage.setItem("forcaWins", wins);
         localStorage.setItem("forcaGames", games);
 
         if (score > record) {
           record = score;
           localStorage.setItem("forcaRecord", record);
-          recordEl.textContent = record;
         }
 
-        scoreEl.textContent = score;
-        streakEl.textContent = streak;
-        gamesEl.textContent = games;
+        updateStatsDisplay();
 
-        messageEl.textContent = `Parabéns! +${points} pontos 🔥 Sequência: ${streak}`;
+        messageEl.textContent = `Parabéns! +${points} pts 🔥 Sequência: ${streak}`;
         messageEl.className = "message win";
         disableAll();
         playWin();
         createConfetti();
+      } else {
+        const remaining = selectedWord.split("").filter(c => c !== " " && !guessedLetters.includes(c)).length;
+        if (remaining === 1) {
+          messageEl.textContent = "Quase lá! Só falta 1 letra 🔥";
+          messageEl.className = "message";
+        } else if (remaining === 2) {
+          messageEl.textContent = "Faltam só 2 letras!";
+          messageEl.className = "message";
+        }
       }
     }
 
@@ -1135,8 +1214,7 @@
         games++;
         localStorage.setItem("forcaStreak", 0);
         localStorage.setItem("forcaGames", games);
-        streakEl.textContent = 0;
-        gamesEl.textContent = games;
+        updateStatsDisplay();
 
         messageEl.textContent = `Você perdeu! A palavra era: ${selectedWord}`;
         messageEl.className = "message lose";
@@ -1151,6 +1229,8 @@
       document.querySelectorAll(".key").forEach(b => b.disabled = true);
       hintBtn.disabled = true;
       revealBtn.disabled = true;
+      const guessBtn = document.getElementById("guess-word-btn");
+      if (guessBtn) guessBtn.disabled = true;
     }
 
     function giveHint() {
@@ -1167,7 +1247,6 @@
       const remaining = selectedWord.split("").filter(c => c !== " " && !guessedLetters.includes(c));
       if (!remaining.length) return;
 
-      // Custa pontos
       score = Math.max(0, score - 15);
       scoreEl.textContent = score;
       localStorage.setItem("forcaScore", score);
@@ -1177,6 +1256,35 @@
       hintLevel = 2;
       revealBtn.disabled = true;
       revealBtn.textContent = "Letra revelada";
+    }
+
+    function guessFullWord() {
+      if (gameOver) return;
+      const input = prompt("Digite a palavra completa:");
+      if (input === null) return;
+      const attempt = input.toUpperCase().trim().replace(/\s+/g, "");
+      if (!attempt) return;
+
+      const cleanWord = selectedWord.replace(/\s+/g, "");
+      if (attempt === cleanWord) {
+        guessedLetters = [...new Set(selectedWord.split("").filter(c => c !== " "))];
+        displayWord();
+        const wasCleanGuess = hintLevel === 0 && wrongGuesses === 0;
+        checkWin();
+        if (gameOver) {
+          const bonus = wasCleanGuess ? 30 : 15;
+          score += bonus;
+          localStorage.setItem("forcaScore", score);
+          updateStatsDisplay();
+          messageEl.textContent = messageEl.textContent.replace("pts", `pts (+${bonus} chute)`);
+        }
+      } else {
+        wrongGuesses = maxWrong;
+        updateHangman();
+        updateInfo();
+        checkLose();
+        messageEl.textContent = `Chute errado! A palavra era: ${selectedWord}`;
+      }
     }
 
     function startNewGame() {
@@ -1192,6 +1300,7 @@
       hintBtn.disabled = false;
       revealBtn.disabled = true;
       revealBtn.textContent = "Revelar (−15 pts)";
+      document.getElementById("guess-word-btn").disabled = false;
 
       pickRandomWord();
       displayWord();
@@ -1204,6 +1313,7 @@
     newGameBtn.addEventListener("click", startNewGame);
     hintBtn.addEventListener("click", giveHint);
     revealBtn.addEventListener("click", revealLetter);
+    document.getElementById("guess-word-btn").addEventListener("click", guessFullWord);
     categorySelect.addEventListener("change", startNewGame);
     difficultySelect.addEventListener("change", startNewGame);
 
@@ -1218,6 +1328,21 @@
     document.getElementById("close-help").addEventListener("click", () => helpModal.classList.remove("open"));
     helpModal.addEventListener("click", e => {
       if (e.target === helpModal) helpModal.classList.remove("open");
+    });
+
+    // Zerar estatísticas
+    document.getElementById("reset-stats-btn").addEventListener("click", () => {
+      if (confirm("Tem certeza que deseja zerar todas as estatísticas?")) {
+        score = 0; record = 0; streak = 0; bestStreak = 0; games = 0; wins = 0;
+        localStorage.removeItem("forcaScore");
+        localStorage.removeItem("forcaRecord");
+        localStorage.removeItem("forcaStreak");
+        localStorage.removeItem("forcaBestStreak");
+        localStorage.removeItem("forcaGames");
+        localStorage.removeItem("forcaWins");
+        updateStatsDisplay();
+        helpModal.classList.remove("open");
+      }
     });
 
     // Inicia
